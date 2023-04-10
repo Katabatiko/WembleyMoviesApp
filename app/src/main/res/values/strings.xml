@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Wembley Movies App</string>
+    <string name="api_key">28886f039be827c8e6a2ff138641f98d</string>
+    <string name="api_access_token">eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyODg4NmYwMzliZTgyN2M4ZTZhMmZmMTM4NjQxZjk4ZCIsInN1YiI6IjY0MmM1NTkxZDEwMGI2MDBiN2FlZjg4NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.BDo-aB_ypfK2QItoZFt_p-vZqC9bJkPr6B0x_T7oFjw</string>
+    <string name="tmdb_disociación">This product uses the TMDB API but is not endorsed or certified by TMDB.</string>
+    <string name="powered_by">Usando la potencia de:</string>
+    <string name="calificacion">Calificación TMDB: %s</string>
+    <string name="favorite">Añadir a favoritos</string>
+    <string name="eliminar">¿Seguro de eliminar de favoritas?</string>
+    <string name="film_poster">Poster de la película</string>
+    <string name="por_estrenar">Por estrenar</string>
+    <string name="title_activity_intro">Intro Activity</string>
+    <string name="busqueda">Buscar películas</string>
+    <string name="guardada">Guardada como favorita</string>
+
+    <string name="first_fragment_label">Películas populares</string>
+    <string name="second_fragment_label">Películas favoritas</string>
+    <string name="pop_tab">Pestaña de películas populares</string>
+    <string name="fav_tab">Pestaña de películas favoritas</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="downloading">Imagen de carga de datos</string>
+    <string name="borrar_fav">Borrar de favoritos</string>
+    <string name="logo_moviedb">Logo de The MovieDb</string>
+    <string name="presenta">Presenta:</string>
+    <string name="logo_wembley_studios">Logo de Wembley Studios</string>
+    <string name="no_hay_favoritas">No hay favoritas</string>
+</resources>
