@@ -27,6 +27,7 @@ import com.gonpas.wembleymoviesapp.repository.MoviesRepository
 import com.gonpas.wembleymoviesapp.utils.FabListener
 import com.gonpas.wembleymoviesapp.utils.OverviewDialogFragment
 import com.gonpas.wembleymoviesapp.utils.OverviewListener
+import java.text.NumberFormat
 
 
 private const val TAG = "xxPmf"
@@ -75,19 +76,18 @@ class PopularMoviesFragment : Fragment() {
             }
         })
 
-        /*viewModel.status.observe(viewLifecycleOwner){
-            Log.d(TAG,"status: $it")
-        }*/
-
         viewModel.popularMoviesList.observe(viewLifecycleOwner){list ->
             adapter.submitList(list)
-//            viewModel.setStatusDone()
+            val totalFormated = NumberFormat.getInstance().format(viewModel.totalMovies)
+            binding.totalFilms.text = getText(R.string.total_movies)
+                .toString().format(totalFormated, "")
         }
 
         val searchView = binding.searchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 viewModel.searchMovies(p0)
+                viewModel.resetFindControls()
                 hideKeyboard()
                 buscando = true
                 return true
@@ -103,7 +103,14 @@ class PopularMoviesFragment : Fragment() {
         })
 
         viewModel.foundMovies.observe(viewLifecycleOwner){
-//            Log.d(TAG,"encontradas: $it")
+//            Log.d(TAG,"encontradas: ${it.size}")
+            if (it.isEmpty()) {
+                Toast.makeText(context, getText(R.string.sin_Resultados), Toast.LENGTH_LONG).show()
+                binding.noFound.visibility = View.VISIBLE
+            }
+            val totalFormated = NumberFormat.getInstance().format(viewModel.found)
+            binding.totalFilms.text = getText(R.string.total_movies)
+                                        .toString().format(totalFormated, getText(R.string.encontradas))
             adapter.submitList(it)
         }
         // configuración del widget de busqueda
@@ -122,7 +129,11 @@ class PopularMoviesFragment : Fragment() {
             object : OnBackPressedCallback(true){
                 override fun handleOnBackPressed() {
                     if (buscando){
+                        binding.noFound.visibility = View.GONE
                         adapter.submitList(viewModel.popularMoviesList.value)
+                        val totalFormated = NumberFormat.getInstance().format(viewModel.totalMovies)
+                        binding.totalFilms.text = getText(R.string.total_movies)
+                            .toString().format(totalFormated, "")
                         buscando = false
                     } else {
                         this.remove()
