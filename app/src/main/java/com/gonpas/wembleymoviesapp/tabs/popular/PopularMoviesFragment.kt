@@ -46,6 +46,8 @@ class PopularMoviesFragment : Fragment() {
         val viewModelFactory = PopularMoviesViewModelFactory(app, moviesRepository)
         val viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[PopularMoviesViewModel::class.java]
 
+        var searchQuery = ""
+
         // Inflate the layout for this fragment
         val binding = DataBindingUtil.inflate<FragmentPopularMoviesBinding>(inflater,R.layout.fragment_popular_movies, container, false)
 
@@ -68,26 +70,38 @@ class PopularMoviesFragment : Fragment() {
 
         recyclerView.adapter = adapter
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            /*override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
+                if(!recyclerView.canScrollVertically(1) && newState != 0){
+                    if (buscando)       viewModel.searchMovies(searchQuery)
+                    else                viewModel.downloadMovies()
+                }
+            }*/
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                Log.d(TAG,"onScrolled")
+                super.onScrolled(recyclerView, dx, dy)
                 if(!recyclerView.canScrollVertically(1)){
-                    viewModel.downloadMovies()
+                    if (buscando)       viewModel.searchMovies(searchQuery)
+                    else                viewModel.downloadMovies()
                 }
             }
         })
 
         viewModel.popularMoviesList.observe(viewLifecycleOwner){list ->
-            adapter.submitList(list)
-            val totalFormated = NumberFormat.getInstance().format(viewModel.totalMovies)
-            binding.totalFilms.text = getText(R.string.total_movies)
-                .toString().format(totalFormated, "")
+            if (list.isNotEmpty()) {
+                adapter.submitList(list)
+                val totalFormated = NumberFormat.getInstance().format(viewModel.totalMovies)
+                binding.totalFilms.text = getText(R.string.total_movies)
+                    .toString().format(totalFormated, "")
+            }
         }
 
         val searchView = binding.searchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                viewModel.searchMovies(p0)
-                viewModel.resetFindControls()
+                searchQuery = p0.toString()
+                viewModel.searchMovies(searchQuery)
+                viewModel.resetSearchControls()
                 hideKeyboard()
                 buscando = true
                 return true
@@ -103,26 +117,19 @@ class PopularMoviesFragment : Fragment() {
         })
 
         viewModel.foundMovies.observe(viewLifecycleOwner){
-//            Log.d(TAG,"encontradas: ${it.size}")
-            if (it.isEmpty()) {
+            Log.d(TAG, "buscando: ${buscando} / encontradas: $it")
+            if (buscando && it.isEmpty()) {
                 Toast.makeText(context, getText(R.string.sin_Resultados), Toast.LENGTH_LONG).show()
                 binding.noFound.visibility = View.VISIBLE
+            } else {
+                binding.noFound.visibility = View.GONE
             }
+
             val totalFormated = NumberFormat.getInstance().format(viewModel.found)
             binding.totalFilms.text = getText(R.string.total_movies)
                                         .toString().format(totalFormated, getText(R.string.encontradas))
             adapter.submitList(it)
         }
-        // configuración del widget de busqueda
-//        val searchManager = Context.getSystemService(Activity.SEARCH_SERVICE) as SearchManager
-
-        // recepción de acción de busqueda
-        /* val intent = requireActivity().intent
-         if (Intent.ACTION_SEARCH == intent.action){
-             intent.getStringExtra(SearchManager.QUERY)?.also { query ->
-                 Log.d(TAG,"query: $query")
-             }
-         }*/
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -135,6 +142,7 @@ class PopularMoviesFragment : Fragment() {
                         binding.totalFilms.text = getText(R.string.total_movies)
                             .toString().format(totalFormated, "")
                         buscando = false
+                        searchQuery = ""
                     } else {
                         this.remove()
                         OnBackPressedDispatcher()

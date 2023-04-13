@@ -1,6 +1,7 @@
 package com.gonpas.wembleymoviesapp.tabs.popular
 
 import android.app.Application
+import android.util.Log
 //import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 
 enum class ApiStatus { LOADING, ERROR, DONE }
 
-//private const val TAG = "xxPmvm"
+private const val TAG = "xxPmvm"
 class PopularMoviesViewModel(val app: Application, private val repository: InterfaceMoviesRepository) : AndroidViewModel(app) {
 
     private val _status = MutableLiveData<ApiStatus>()
@@ -33,7 +34,7 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
     val foundMovies: LiveData<List<DomainMovie>>
         get() = _foundMovies
     var found = 0
-    private var nextFoundPage = 1
+    var nextFoundPage = 1
     private var lastFoundPage = 1
 
 
@@ -41,21 +42,24 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
     private val configuration: LiveData<ImagesDto>
         get() = _configuration
 
+    var lastSuccessQuery = ""
 //    private val repository = MoviesRepository(getDatabase(app))
 
 
     init {
+        _popularMoviesList.value = listOf()
+//        _foundMovies.value = listOf()
         downloadConfiguration()
         downloadMovies()
     }
 
-    fun resetFindControls(){
+    fun resetSearchControls(){
         nextFoundPage = 1
         lastFoundPage = 1
     }
 
 
-    fun downloadConfiguration(){
+    private fun downloadConfiguration(){
         viewModelScope.launch {
             try {
                 getConfiguration()
@@ -87,17 +91,17 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
     }
     private suspend fun getPopularMovies(){
 
-        if (lastPopPage >= nextPopPage) {
+        if (nextPopPage <= lastPopPage) {
             val moviesLIstDto = repository.downloadPopMovies(nextPopPage)
-            if (_popularMoviesList.value.isNullOrEmpty()) {
-                lastPopPage = moviesLIstDto.totalPages
-                totalMovies = moviesLIstDto.totalResults
+            lastPopPage = moviesLIstDto.totalPages
+            totalMovies = moviesLIstDto.totalResults
+            /*if (_popularMoviesList.value.isNullOrEmpty()) {
                 _popularMoviesList.value = moviesLIstDto.results.asList()
                     .asListDomainMovies(
                         configuration.value!!.secureBaseUrl,
                         configuration.value!!.posterSizes[2]
                     )
-            } else {
+            } else {*/
                 _popularMoviesList.value = _popularMoviesList.value!!.plus(
                     moviesLIstDto.results.asList()
                         .asListDomainMovies(
@@ -105,7 +109,7 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
                             configuration.value!!.posterSizes[2]
                         )
                 )
-            }
+          /*  }*/
             nextPopPage++
         } else {
             Toast.makeText(app, app.getText(R.string.noMas), Toast.LENGTH_LONG).show()
@@ -139,20 +143,38 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
     }
 
     private suspend fun buscarMovies(query: String){
-        if (lastFoundPage >= nextFoundPage) {
-            val moviesListDto = repository.searchMovie(query, nextFoundPage)
+        val newQuery = lastSuccessQuery != query
+        if (newQuery)      resetSearchControls()
+
+        if (nextFoundPage <= lastFoundPage) {
+            val moviesListDto = repository.searchMovie(query, nextFoundPage++)
             found = moviesListDto.totalResults
             lastFoundPage = moviesListDto.totalPages
-            _foundMovies.value =
-                moviesListDto.results.asList().asListDomainMovies(
-                    configuration.value!!.secureBaseUrl,
-                    configuration.value!!.posterSizes[2]
+            if( newQuery ) {
+                _foundMovies.value = moviesListDto.results.asList()
+                    .asListDomainMovies(
+                        configuration.value!!.secureBaseUrl,
+                        configuration.value!!.posterSizes[2]
+                    )
+                if (_foundMovies.value!!.isNotEmpty())       lastSuccessQuery = query
+            } else {
+                _foundMovies.value = _foundMovies.value!!.plus(
+                    moviesListDto.results.asList().asListDomainMovies(
+                        configuration.value!!.secureBaseUrl,
+                        configuration.value!!.posterSizes[2]
+                    )
                 )
-            _status.value = ApiStatus.DONE
-            nextFoundPage++
+            }
+//            nextFoundPage++
         } else {
             Toast.makeText(app, app.getText(R.string.noMas), Toast.LENGTH_LONG).show()
+            Log.d(TAG,"buscando sin resultados")
         }
+        _status.value = ApiStatus.DONE
+        Log.d(TAG, "newQuery: $newQuery")
+        Log.d(TAG,"lastSuccessQuery: $lastSuccessQuery")
+        Log.d(TAG, "nextFoundPage: $nextFoundPage")
+        Log.d(TAG, "lastFoundPage: $lastFoundPage")
     }
 
     /*val noHayVisibility = _foundMovies.map {

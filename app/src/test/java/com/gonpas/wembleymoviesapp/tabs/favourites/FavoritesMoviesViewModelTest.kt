@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.gonpas.wembleymoviesapp.MainCoroutineRule
+import com.gonpas.wembleymoviesapp.database.MovieDb
 import com.gonpas.wembleymoviesapp.domain.DomainMovie
 import com.gonpas.wembleymoviesapp.getOrAwaitValue
 import com.gonpas.wembleymoviesapp.repository.FakeMoviesRepository
@@ -77,7 +78,7 @@ class FavoritesMoviesViewModelTest {
 
     @Test
     fun removeMovie() = runTest {
-            val value = favMoviesViewModel.favsMovies.getOrAwaitValue()
+            /*val value = favMoviesViewModel.favsMovies.getOrAwaitValue()
 //            val repoMovies = moviesRepository.getMoviesFromDb().getOrAwaitValue()
 
             favMoviesViewModel.removeMovie(movieDb1.movieId)
@@ -85,6 +86,19 @@ class FavoritesMoviesViewModelTest {
 //            assertEquals(1, repoMovies?.size ?: 100)
             assertThat(value[1].title, `is`("Vientos del norte"))
             assertThat(value.size.toString(), `is`("1"))
+            assertThat(value[0].title, `is`("Vientos del norte"))*/
+
+        val observer = Observer<List<DomainMovie>>{}
+        try {
+            favMoviesViewModel.favsMovies.observeForever(observer)
+            favMoviesViewModel.removeMovie(movieDb1.movieId)
+
+            val value = favMoviesViewModel.favsMovies.value
+
+            assertThat(value!!.size.toString(), `is`("1"))
             assertThat(value[0].title, `is`("Vientos del norte"))
+        } finally {
+            favMoviesViewModel.favsMovies.removeObserver(observer)
+        }
     }
 }
