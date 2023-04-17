@@ -8,8 +8,8 @@ import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.gonpas.wembleymoviesapp.tabs.popular.ApiStatus
 import com.gonpas.wembleymoviesapp.R
+import com.gonpas.wembleymoviesapp.tabs.ApiStatus
 
 @BindingAdapter("imageUrl")
 fun bindImage(imgView: ImageView, imgUrl: String){

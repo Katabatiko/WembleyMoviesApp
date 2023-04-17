@@ -9,7 +9,8 @@
             type="com.gonpas.wembleymoviesapp.domain.DomainMovie" />
         <variable
             name="viewModel"
-            type="com.gonpas.wembleymoviesapp.tabs.popular.PopularMoviesViewModel" />
+            type="com.gonpas.wembleymoviesapp.tabs.MoviesViewModel" />
+        <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -83,6 +84,7 @@
             android:clickable="true"
             android:contentDescription="@string/favorite"
             android:focusable="true"
+            android:visibility="@{ movie.fav ? View.GONE : View.VISIBLE }"
             app:backgroundTint="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="@+id/poster"
             app:layout_constraintTop_toTopOf="@+id/poster"

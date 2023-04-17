@@ -23,7 +23,10 @@ import com.gonpas.wembleymoviesapp.database.getDatabase
 import com.gonpas.wembleymoviesapp.databinding.FragmentPopularMoviesBinding
 import com.gonpas.wembleymoviesapp.databinding.MovieItemBinding
 import com.gonpas.wembleymoviesapp.domain.DomainMovie
+import com.gonpas.wembleymoviesapp.network.TmdbApi
 import com.gonpas.wembleymoviesapp.repository.MoviesRepository
+import com.gonpas.wembleymoviesapp.tabs.MoviesViewModel
+import com.gonpas.wembleymoviesapp.tabs.MoviesViewModelFactory
 import com.gonpas.wembleymoviesapp.utils.FabListener
 import com.gonpas.wembleymoviesapp.utils.OverviewDialogFragment
 import com.gonpas.wembleymoviesapp.utils.OverviewListener
@@ -42,9 +45,9 @@ class PopularMoviesFragment : Fragment() {
     ): View {
         val app = requireNotNull(activity).application
         val database = getDatabase(app)
-        val moviesRepository = MoviesRepository(database)
-        val viewModelFactory = PopularMoviesViewModelFactory(app, moviesRepository)
-        val viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[PopularMoviesViewModel::class.java]
+        val moviesRepository = MoviesRepository(TmdbApi.tmdbApiService, database.movieDao)
+        val viewModelFactory = MoviesViewModelFactory(app, moviesRepository)
+        val viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[MoviesViewModel::class.java]
 
         var searchQuery = ""
 
@@ -59,6 +62,7 @@ class PopularMoviesFragment : Fragment() {
         val adapter = MoviesAdapter(
             viewModel,
             FabListener {
+                it.fav = true
                 viewModel.saveFavMovie(it)
                 Toast.makeText(context, getString(R.string.guardada), Toast.LENGTH_LONG).show()
             },
@@ -78,7 +82,7 @@ class PopularMoviesFragment : Fragment() {
                 }
             }*/
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                Log.d(TAG,"onScrolled")
+//                Log.d(TAG,"onScrolled")
                 super.onScrolled(recyclerView, dx, dy)
                 if(!recyclerView.canScrollVertically(1)){
                     if (buscando)       viewModel.searchMovies(searchQuery)
@@ -89,10 +93,19 @@ class PopularMoviesFragment : Fragment() {
 
         viewModel.popularMoviesList.observe(viewLifecycleOwner){list ->
             if (list.isNotEmpty()) {
+//                Log.d(TAG,"cambios en popsMovies")
+//                if (!viewModel.favsMovies.value!!.isNullOrEmpty())                viewModel.evalFavsInPops()
                 adapter.submitList(list)
                 val totalFormated = NumberFormat.getInstance().format(viewModel.totalMovies)
                 binding.totalFilms.text = getText(R.string.total_movies)
                     .toString().format(totalFormated, "")
+            }
+        }
+
+        viewModel.favsMovies.observe(viewLifecycleOwner){
+//            Log.d(TAG,"cambios en favsMovies")
+            if (viewModel.popularMoviesList.value?.isNotEmpty() == true){
+                viewModel.evalFavsInPops()
             }
         }
 
@@ -117,12 +130,9 @@ class PopularMoviesFragment : Fragment() {
         })
 
         viewModel.foundMovies.observe(viewLifecycleOwner){
-            Log.d(TAG, "buscando: ${buscando} / encontradas: $it")
+            Log.d(TAG, "buscando: $buscando / encontradas: $it")
             if (buscando && it.isEmpty()) {
                 Toast.makeText(context, getText(R.string.sin_Resultados), Toast.LENGTH_LONG).show()
-                binding.noFound.visibility = View.VISIBLE
-            } else {
-                binding.noFound.visibility = View.GONE
             }
 
             val totalFormated = NumberFormat.getInstance().format(viewModel.found)
@@ -165,7 +175,7 @@ class PopularMoviesFragment : Fragment() {
     }
 
     class MoviesAdapter(
-        val viewModel: PopularMoviesViewModel,
+        private val viewModel: MoviesViewModel,
         private val fabClickListener: FabListener,
         private val overviewListener: OverviewListener
     ): ListAdapter<DomainMovie, MoviesAdapter.MovieViewHolder>(MovieDiffCallback){
@@ -182,10 +192,11 @@ class PopularMoviesFragment : Fragment() {
             holder.binding.overview.setOnClickListener{
                 overviewListener.onClick(item)
             }
-//            val fab = holder.binding.floatingActionButton
+            /*val fab = holder.binding.floatingActionButton
+            if (item.fav)  fab.visibility = View.GONE*/
             holder.binding.floatingActionButton.setOnClickListener{
                 fabClickListener.onClick(item)
-//                fab.visibility = View.INVISIBLE
+                it.visibility = View.INVISIBLE
             }
             holder.binding.executePendingBindings()
         }

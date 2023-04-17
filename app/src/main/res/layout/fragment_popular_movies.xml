@@ -6,7 +6,8 @@
     <data>
         <variable
             name="viewModel"
-            type="com.gonpas.wembleymoviesapp.tabs.popular.PopularMoviesViewModel" />
+            type="com.gonpas.wembleymoviesapp.tabs.MoviesViewModel" />
+        <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -53,7 +54,7 @@
             android:layout_height="wrap_content"
             android:text="@string/sin_Resultados"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:visibility="gone"
+            android:visibility="@{ viewModel.noFoundVisibility ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

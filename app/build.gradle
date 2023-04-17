@@ -46,6 +46,8 @@ android {
     }
     testOptions.unitTests {
         includeAndroidResources = true
+        // para evitar el error "Method..... not mocked"
+        returnDefaultValues = true
     }
 }
 
@@ -90,5 +92,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation "androidx.arch.core:core-testing:2.2.0"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2"
+
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

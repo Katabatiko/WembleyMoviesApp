@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.gonpas.wembleymoviesapp.tabs.favourites.FavoritesMoviesViewModel" />
+            type="com.gonpas.wembleymoviesapp.tabs.MoviesViewModel" />
         <import type="android.view.View" />
     </data>
 
@@ -24,6 +24,7 @@
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textStyle="bold"
+            android:visibility="@{ viewModel.noHayFavorites ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="@+id/list_fav_movies"
             app:layout_constraintEnd_toEndOf="@+id/list_fav_movies"
             app:layout_constraintStart_toStartOf="@+id/list_fav_movies"

@@ -9,7 +9,7 @@
             type="com.gonpas.wembleymoviesapp.domain.DomainMovie" />
         <variable
             name="viewModel"
-            type="com.gonpas.wembleymoviesapp.tabs.favourites.FavoritesMoviesViewModel" />
+            type="com.gonpas.wembleymoviesapp.tabs.MoviesViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -1,4 +1,4 @@
-package com.gonpas.wembleymoviesapp.tabs.popular
+package com.gonpas.wembleymoviesapp.tabs
 
 import android.app.Application
 import android.util.Log
@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.gonpas.wembleymoviesapp.R
+import com.gonpas.wembleymoviesapp.database.asListDomainMovies
 import com.gonpas.wembleymoviesapp.domain.DomainMovie
 import com.gonpas.wembleymoviesapp.domain.asMovieDb
 import com.gonpas.wembleymoviesapp.network.*
@@ -16,8 +17,8 @@ import kotlinx.coroutines.launch
 
 enum class ApiStatus { LOADING, ERROR, DONE }
 
-private const val TAG = "xxPmvm"
-class PopularMoviesViewModel(val app: Application, private val repository: InterfaceMoviesRepository) : AndroidViewModel(app) {
+private const val TAG = "xxMvm"
+class MoviesViewModel(val app: Application, private val repository: InterfaceMoviesRepository) : AndroidViewModel(app) {
 
     private val _status = MutableLiveData<ApiStatus>()
     val status: LiveData<ApiStatus>
@@ -36,23 +37,29 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
     var found = 0
     var nextFoundPage = 1
     private var lastFoundPage = 1
-
+    private var lastSuccessQuery = ""
 
     private val _configuration = MutableLiveData<ImagesDto>()
-    private val configuration: LiveData<ImagesDto>
+    val configuration: LiveData<ImagesDto>
         get() = _configuration
 
-    var lastSuccessQuery = ""
-//    private val repository = MoviesRepository(getDatabase(app))
+
+    /* FAVORITES */
+    val favsMovies: LiveData<List<DomainMovie>> = repository.getMoviesFromDb().asListDomainMovies()
+
 
 
     init {
-        _popularMoviesList.value = listOf()
-//        _foundMovies.value = listOf()
+//        _popularMoviesList.value = listOf()
         downloadConfiguration()
         downloadMovies()
     }
-
+    /**
+     * Se restablecen las variables de busqueda
+     * de la paginación a valor por defecto '1':
+     * nextFoundPage
+     * lastFoundPage
+     */
     fun resetSearchControls(){
         nextFoundPage = 1
         lastFoundPage = 1
@@ -66,12 +73,11 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
             }catch (ce: CancellationException){
                 throw ce
             }catch (e: Exception){
-                _status.value = ApiStatus.ERROR
+                _status.postValue(ApiStatus.ERROR)
                 Toast.makeText(app, e.message, Toast.LENGTH_LONG).show()
             }
         }
     }
-
     private suspend fun getConfiguration(){
         _configuration.value = repository.getConfiguration().images
     }
@@ -95,26 +101,42 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
             val moviesLIstDto = repository.downloadPopMovies(nextPopPage)
             lastPopPage = moviesLIstDto.totalPages
             totalMovies = moviesLIstDto.totalResults
-            /*if (_popularMoviesList.value.isNullOrEmpty()) {
+
+            if(!_popularMoviesList.isInitialized){
                 _popularMoviesList.value = moviesLIstDto.results.asList()
-                    .asListDomainMovies(
-                        configuration.value!!.secureBaseUrl,
-                        configuration.value!!.posterSizes[2]
-                    )
-            } else {*/
-                _popularMoviesList.value = _popularMoviesList.value!!.plus(
-                    moviesLIstDto.results.asList()
                         .asListDomainMovies(
                             configuration.value!!.secureBaseUrl,
                             configuration.value!!.posterSizes[2]
                         )
+            } else {
+                _popularMoviesList.postValue(
+                    _popularMoviesList.value!!.plus(
+                        moviesLIstDto.results.asList()
+                            .asListDomainMovies(
+                                configuration.value!!.secureBaseUrl,
+                                configuration.value!!.posterSizes[2]
+                            )
+                    )
                 )
-          /*  }*/
+            }
+
             nextPopPage++
         } else {
             Toast.makeText(app, app.getText(R.string.noMas), Toast.LENGTH_LONG).show()
         }
         _status.value = ApiStatus.DONE
+    }
+
+    fun evalFavsInPops() {
+//        Log.d(TAG,"evaluando favoritos en populares")
+        /*val rangoInf = (nextPopPage -1) * 10
+        val rangoSup = rangoInf +20
+        Log.d(TAG, "rangoInf: $rangoInf - rangoSup: $rangoSup")*/
+        _popularMoviesList.value!!.forEach { pop ->
+            favsMovies.value!!.forEach {
+                if (it.id == pop.id)        pop.fav = true
+            }
+        }
     }
 
     fun saveFavMovie(movie: DomainMovie){
@@ -143,11 +165,11 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
     }
 
     private suspend fun buscarMovies(query: String){
-        val newQuery = lastSuccessQuery != query
+        var newQuery = lastSuccessQuery != query
         if (newQuery)      resetSearchControls()
 
         if (nextFoundPage <= lastFoundPage) {
-            val moviesListDto = repository.searchMovie(query, nextFoundPage++)
+            val moviesListDto = repository.searchMovieFromRemote(query, nextFoundPage++)
             found = moviesListDto.totalResults
             lastFoundPage = moviesListDto.totalPages
             if( newQuery ) {
@@ -156,7 +178,10 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
                         configuration.value!!.secureBaseUrl,
                         configuration.value!!.posterSizes[2]
                     )
-                if (_foundMovies.value!!.isNotEmpty())       lastSuccessQuery = query
+                if (_foundMovies.value!!.isNotEmpty()) {
+                    lastSuccessQuery = query
+                    newQuery = false
+                }
             } else {
                 _foundMovies.value = _foundMovies.value!!.plus(
                     moviesListDto.results.asList().asListDomainMovies(
@@ -165,10 +190,9 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
                     )
                 )
             }
-//            nextFoundPage++
         } else {
             Toast.makeText(app, app.getText(R.string.noMas), Toast.LENGTH_LONG).show()
-            Log.d(TAG,"buscando sin resultados")
+            Log.d(TAG,"busqueda sin resultados")
         }
         _status.value = ApiStatus.DONE
         Log.d(TAG, "newQuery: $newQuery")
@@ -177,22 +201,34 @@ class PopularMoviesViewModel(val app: Application, private val repository: Inter
         Log.d(TAG, "lastFoundPage: $lastFoundPage")
     }
 
-    /*val noHayVisibility = _foundMovies.map {
+    val noFoundVisibility = _foundMovies.map {
         it.isEmpty()
-    }*/
+    }
+
+
+    /* FAFORITES */
+    fun removeMovie(movieId: Int){
+        viewModelScope.launch {
+            repository.removeFavMovie(movieId)
+        }
+    }
+
+    val noHayFavorites = favsMovies.map {
+        it.isEmpty()
+    }
 
 }
 
 
 @Suppress("UNCHECKED_CAST")
-class PopularMoviesViewModelFactory(
+class MoviesViewModelFactory(
     private val app: Application,
     private val moviesRepository: MoviesRepository
     ): ViewModelProvider.Factory{
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PopularMoviesViewModel::class.java)) {
-            return PopularMoviesViewModel(app, moviesRepository) as T
+        if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
+            return MoviesViewModel(app, moviesRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class\nNOT a PopularMoviesViewModel")
     }

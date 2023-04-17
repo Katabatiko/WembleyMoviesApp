@@ -20,7 +20,7 @@ data class DomainMovie(
     val voteAverage: Float,
 //    val genresIds: Array<Int>,
     val voteCount: Int,
-    val fav: Boolean = false
+    var fav: Boolean = false
 ) : Parcelable{
     val shortOverview: String
         get() = overview.smartTruncate(140)

@@ -17,7 +17,10 @@ import com.gonpas.wembleymoviesapp.database.getDatabase
 import com.gonpas.wembleymoviesapp.databinding.FavItemBinding
 import com.gonpas.wembleymoviesapp.databinding.FragmentFavoritesMoviesBinding
 import com.gonpas.wembleymoviesapp.domain.DomainMovie
+import com.gonpas.wembleymoviesapp.network.TmdbApi
 import com.gonpas.wembleymoviesapp.repository.MoviesRepository
+import com.gonpas.wembleymoviesapp.tabs.MoviesViewModel
+import com.gonpas.wembleymoviesapp.tabs.MoviesViewModelFactory
 import com.gonpas.wembleymoviesapp.utils.FabListener
 import com.gonpas.wembleymoviesapp.utils.OverviewDialogFragment
 import com.gonpas.wembleymoviesapp.utils.OverviewListener
@@ -34,11 +37,14 @@ class FavoritesMoviesFragment : Fragment() {
         // Inflate the layout for this fragment
         val app = requireNotNull(activity).application
         val database = getDatabase(app)
-        val moviesRepository = MoviesRepository(database)
-        val viewModelFactory = FavoritesMoviesViewModelFactory(app, moviesRepository)
-        val viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[FavoritesMoviesViewModel::class.java]
+        val moviesRepository = MoviesRepository(TmdbApi.tmdbApiService, database.movieDao)
+        val viewModelFactory = MoviesViewModelFactory(app, moviesRepository)
+        val viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[MoviesViewModel::class.java]
 
         val binding = DataBindingUtil.inflate<FragmentFavoritesMoviesBinding>(inflater, R.layout.fragment_favorites_movies, container, false)
+
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
 
         val adapter = FavoritesAdapter(
             viewModel,
@@ -47,6 +53,7 @@ class FavoritesMoviesFragment : Fragment() {
                 builder.setMessage(getString(R.string.eliminar))
                     .setCancelable(false)
                     .setPositiveButton("Confirmar"){ _, _ ->
+                        it.fav = false
                         viewModel.removeMovie(it.id)
                     }
                     .setNegativeButton("Cancelar"){ dialog, _ ->
@@ -64,16 +71,20 @@ class FavoritesMoviesFragment : Fragment() {
 //
         viewModel.favsMovies.observe(viewLifecycleOwner){
             adapter.submitList(it)
-            if (it.isEmpty())   binding.avisoNoHay.visibility = View.VISIBLE
-            else                binding.avisoNoHay.visibility = View.GONE
+            /*if (it.isEmpty())   binding.avisoNoHay.visibility = View.VISIBLE
+            else                binding.avisoNoHay.visibility = View.GONE*/
         }
 
         return binding.root
     }
 
+    fun findInPops(favId: Int){
+        TODO()
+    }
+
 
     class FavoritesAdapter(
-        val viewModel: FavoritesMoviesViewModel,
+        val viewModel: MoviesViewModel,
         private val fabClickListener: FabListener,
         private val overviewListener: OverviewListener
     ): ListAdapter<DomainMovie, FavoritesAdapter.FavoriteViewHolder>(MovieDiffCallback){
@@ -90,6 +101,7 @@ class FavoritesMoviesFragment : Fragment() {
             holder.binding.overview.setOnClickListener{
                 overviewListener.onClick(item)
             }
+
             holder.binding.floatingActionButton.setOnClickListener{
                 fabClickListener.onClick(item)
             }
