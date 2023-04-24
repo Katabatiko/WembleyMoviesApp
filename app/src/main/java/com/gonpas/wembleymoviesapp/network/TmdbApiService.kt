@@ -9,7 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-private const val API_KEY = "28886f039be827c8e6a2ff138641f98d"
+private const val API_KEY = "NECESITA UNA API_KEY DE The MovieDb"
 private const val TMBD_BASE_URL = "https://api.themoviedb.org/3/"
 
 

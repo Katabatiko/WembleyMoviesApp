@@ -5,8 +5,10 @@
     <string name="tmdb_disociación">This product uses the TMDB API but is not endorsed or certified by TMDB.</string>
     <string name="powered_by">Usando la potencia de:</string>
     <string name="calificacion">Calificación TMDB: %s</string>
+    <string name="fecha_estreno">Fecha estreno: %s/%s/%s</string>
     <string name="favorite">Añadir a favoritos</string>
-    <string name="eliminar">¿Seguro de eliminar de favoritas?</string>
+    <string name="eliminar">¿Seguro de eliminar \'%s\' de favoritas?</string>
+    <string name="confirmar">Confirmar</string>
     <string name="film_poster">Poster de la película</string>
     <string name="por_estrenar">Por estrenar</string>
     <string name="title_activity_intro">Intro Activity</string>

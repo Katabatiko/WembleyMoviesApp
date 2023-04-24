@@ -1,6 +1,7 @@
 package com.gonpas.wembleymoviesapp.utils
 
 import com.gonpas.wembleymoviesapp.domain.DomainMovie
+import java.text.NumberFormat
 
 
 private val PUNCTUATION = listOf(", ", "; ", ": ", " ")
@@ -33,10 +34,13 @@ fun String.smartTruncate(length: Int): String {
 }
 
 
-
 class OverviewListener(val clickListener: (movie: DomainMovie) -> Unit){
     fun onClick(movie: DomainMovie) = clickListener(movie)
 }
 class FabListener(val clickListener: (movie: DomainMovie) -> Unit){
     fun onClick(movie: DomainMovie) = clickListener(movie)
+}
+
+fun localNumberFormat(number: Int): String{
+    return NumberFormat.getInstance().format(number)
 }

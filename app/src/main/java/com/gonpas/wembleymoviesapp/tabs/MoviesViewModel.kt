@@ -1,7 +1,6 @@
 package com.gonpas.wembleymoviesapp.tabs
 
 import android.app.Application
-import android.util.Log
 //import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
@@ -11,7 +10,6 @@ import com.gonpas.wembleymoviesapp.domain.DomainMovie
 import com.gonpas.wembleymoviesapp.domain.asMovieDb
 import com.gonpas.wembleymoviesapp.network.*
 import com.gonpas.wembleymoviesapp.repository.InterfaceMoviesRepository
-import com.gonpas.wembleymoviesapp.repository.MoviesRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -55,8 +53,8 @@ class MoviesViewModel(val app: Application, private val repository: InterfaceMov
         downloadMovies()
     }
     /**
-     * Se restablecen las variables de busqueda
-     * de la paginación a valor por defecto '1':
+     * Se restablecen las variables de paginación
+     * de la busqueda a valor por defecto '1':
      * nextFoundPage
      * lastFoundPage
      */
@@ -127,14 +125,30 @@ class MoviesViewModel(val app: Application, private val repository: InterfaceMov
         _status.value = ApiStatus.DONE
     }
 
-    fun evalFavsInPops() {
-//        Log.d(TAG,"evaluando favoritos en populares")
-        /*val rangoInf = (nextPopPage -1) * 10
-        val rangoSup = rangoInf +20
-        Log.d(TAG, "rangoInf: $rangoInf - rangoSup: $rangoSup")*/
-        _popularMoviesList.value!!.forEach { pop ->
-            favsMovies.value!!.forEach {
-                if (it.id == pop.id)        pop.fav = true
+    fun evalFavsInPops(parcial: Boolean) {
+//        Log.d(TAG,"evaluando favoritos en populares: parcial $parcial")
+        if (parcial) {
+            val lastPos = _popularMoviesList.value!!.size
+            val rangoInf =  if (lastPos < 20)   0
+                            else                lastPos - 20
+
+            _popularMoviesList.value!!.subList(rangoInf, lastPos).forEach { pop ->
+//                Log.d(TAG,"titulo en parcial: ${pop.title} -> ${pop.id}")
+                favsMovies.value!!.forEach {
+                    if (it.id == pop.id) {
+                        pop.fav = true
+//                        Log.d(TAG,"favorita: ${it.title}")
+                    }
+                }
+            }
+        } else {
+            _popularMoviesList.value!!.forEach { pop ->
+//                Log.d(TAG,"pop.title: ${pop.title} -> ${pop.id}")
+                favsMovies.value!!.forEach {
+                    pop.fav = it.id == pop.id
+//                    Log.d(TAG,"fav.id: ${it.id} - pop.fav: ${pop.fav}")
+
+                }
             }
         }
     }
@@ -192,13 +206,13 @@ class MoviesViewModel(val app: Application, private val repository: InterfaceMov
             }
         } else {
             Toast.makeText(app, app.getText(R.string.noMas), Toast.LENGTH_LONG).show()
-            Log.d(TAG,"busqueda sin resultados")
+//            Log.d(TAG,"busqueda sin resultados")
         }
         _status.value = ApiStatus.DONE
-        Log.d(TAG, "newQuery: $newQuery")
-        Log.d(TAG,"lastSuccessQuery: $lastSuccessQuery")
-        Log.d(TAG, "nextFoundPage: $nextFoundPage")
-        Log.d(TAG, "lastFoundPage: $lastFoundPage")
+//        Log.d(TAG, "newQuery: $newQuery")
+//        Log.d(TAG,"lastSuccessQuery: $lastSuccessQuery")
+//        Log.d(TAG, "nextFoundPage: $nextFoundPage")
+//        Log.d(TAG, "lastFoundPage: $lastFoundPage")
     }
 
     val noFoundVisibility = _foundMovies.map {
@@ -223,7 +237,7 @@ class MoviesViewModel(val app: Application, private val repository: InterfaceMov
 @Suppress("UNCHECKED_CAST")
 class MoviesViewModelFactory(
     private val app: Application,
-    private val moviesRepository: MoviesRepository
+    private val moviesRepository: InterfaceMoviesRepository
     ): ViewModelProvider.Factory{
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

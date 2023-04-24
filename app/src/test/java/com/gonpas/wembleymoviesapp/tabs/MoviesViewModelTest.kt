@@ -8,9 +8,7 @@ import com.gonpas.wembleymoviesapp.repository.FakeMoviesRepository
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
@@ -39,7 +37,8 @@ internal class MoviesViewModelTest{
     var instantExecutorRule = InstantTaskExecutorRule()
 
 
-    val testDispatcher = Dispatchers.Unconfined
+    @ExperimentalCoroutinesApi
+    val testDispatcher = UnconfinedTestDispatcher()
     @Before
     fun setupDispatcher() {
         Dispatchers.setMain(testDispatcher)
@@ -64,7 +63,7 @@ internal class MoviesViewModelTest{
        assertThat(value, not(nullValue()))
     }
     @Test
-    fun downloadMoviesTest() = runTest{
+    fun downloadMoviesTest() {
        val movies = moviesViewModel.popularMoviesList.getOrAwaitValue()
 
        assertThat(movies, (not(emptyList())))

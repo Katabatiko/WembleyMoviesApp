@@ -2,7 +2,7 @@ package com.gonpas.wembleymoviesapp.network
 
 import kotlinx.coroutines.delay
 
-object FakeRemoteService: TmdbApiService {
+object FakeAndroidTestRemoteService: TmdbApiService {
 
     private const val SERVICE_LATENCY = 0L
 
@@ -13,7 +13,7 @@ object FakeRemoteService: TmdbApiService {
 
 
 
-    private val movieDto1 = MovieDto(
+    val movieDto1 = MovieDto(
         adult = false,
         backdropPath = null,
         id = 10000,

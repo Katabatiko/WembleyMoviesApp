@@ -53,7 +53,7 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -93,5 +93,25 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:2.2.0"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2"
 
+    // Dependencies for Android instrumented unit tests
+    androidTestImplementation "junit:junit:4.13.2"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2"
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.5"
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+
+//    androidTestImplementation "org.robolectricshadows-framework:4.9"
+    // hasta solucionarse un bug, se incluye este codigo de test en el codigo de produccion
+    // probando debugImplementation para evitarlo
+    // ELIMINAR PARA PRODUCCION
+    debugImplementation "androidx.fragment:fragment-testing:1.5.6"
+    debugImplementation "androidx.test:core:1.5.0"
+
+    // espresso
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    // para los test de espresso con RecyclerView
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    // para la gestion de recursos inactivos (idling resources)
+    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.5.1'
 }

@@ -3,12 +3,12 @@ package com.gonpas.wembleymoviesapp.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.gonpas.wembleymoviesapp.database.FakeLocalDataSource
 import com.gonpas.wembleymoviesapp.domain.asMovieDb
-import com.gonpas.wembleymoviesapp.getOrAwaitValue
 import com.gonpas.wembleymoviesapp.network.FakeRemoteService
 import com.gonpas.wembleymoviesapp.network.asListDomainMovies
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -31,7 +31,7 @@ class MoviesRepositoryTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
 
-    val testDispatcher = Dispatchers.Unconfined
+    val testDispatcher = UnconfinedTestDispatcher()
     @Before
     fun setupDispatcher() {
         Dispatchers.setMain(testDispatcher)
@@ -39,7 +39,7 @@ class MoviesRepositoryTest {
 
     @Before
     fun setUp() {
-        val testDispatcher = Dispatchers.Unconfined
+        val testDispatcher = UnconfinedTestDispatcher()
         repository = MoviesRepository(FakeRemoteService, FakeLocalDataSource(), testDispatcher )
     }
 

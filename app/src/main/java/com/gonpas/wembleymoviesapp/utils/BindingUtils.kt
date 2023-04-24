@@ -37,7 +37,7 @@ fun TextView.setNota(nota: Float){
 fun TextView.localDate(date: String){
     text = if(date != "") {
         val partes = date.split("-")
-        val template = "Fecha estreno: %s/%s/%s"
+        val template = resources.getString(R.string.fecha_estreno)
         template.format(partes[2], partes[1], partes[0])
     } else {
         resources.getString(R.string.por_estrenar)

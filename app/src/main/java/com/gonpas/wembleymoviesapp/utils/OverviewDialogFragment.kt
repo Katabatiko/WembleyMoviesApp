@@ -19,4 +19,8 @@ class OverviewDialogFragment(val title: String, private val msg: String) : Dialo
             builder.create()
         } ?: throw java.lang.IllegalStateException("¡¡¡ Activity null !!!")
     }
+
+    fun get() : OverviewDialogFragment{
+        return this
+    }
 }
