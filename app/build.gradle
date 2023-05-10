@@ -58,6 +58,11 @@ dependencies {
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    // Java language implementation
+    implementation("androidx.fragment:fragment:1.5.7")
+    // Kotlin
+    implementation("androidx.fragment:fragment-ktx:1.5.7")
 
     // retrofit y moshi
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -72,11 +77,13 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1"
 
     // Room
     implementation "androidx.room:room-runtime:2.5.1"
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    testImplementation 'junit:junit:4.12'
     kapt "androidx.room:room-compiler:2.5.1"
     implementation "androidx.room:room-ktx:2.5.1"
 
@@ -103,7 +110,7 @@ dependencies {
     // hasta solucionarse un bug, se incluye este codigo de test en el codigo de produccion
     // probando debugImplementation para evitarlo
     // ELIMINAR PARA PRODUCCION
-    debugImplementation "androidx.fragment:fragment-testing:1.5.6"
+    debugImplementation "androidx.fragment:fragment-testing:1.5.7"
     debugImplementation "androidx.test:core:1.5.0"
 
     // espresso

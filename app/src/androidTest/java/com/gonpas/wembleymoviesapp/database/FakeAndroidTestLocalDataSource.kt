@@ -27,13 +27,25 @@ class FakeAndroidTestLocalDataSource: MoviesDao {
         voteAverage = 8.8f,
         voteCount = 535
     )
+    private val movieDb3 = MovieDb(
+        backdropPath = "/3CxUndGhUcZdt1Zggjdb2HkLLQX.jpg",
+        movieId = 640146,
+        title = "Ant-Man y la Avispa: Quantumanía",
+        overview = "La pareja de superhéroes Scott Lang y Hope van Dyne regresa para continuar sus aventuras",
+        imgUrl = "http://image.tmdb.org/t/p/w185/jTNYlTEijZ6c8Mn4gvINOeB2HWM.jpg",
+        releaseDate = "2023-02-15",
+        popularity = 4665.438f,
+        voteAverage = 6.573f,
+        voteCount = 2301
+    )
 
     private val _observableMovies = MutableLiveData<List<MovieDb>>()
 
     init {
         _observableMovies.postValue(listOf(
                 movieDb1,
-                movieDb2
+                movieDb2,
+                movieDb3
             )
         )
     }

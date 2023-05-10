@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF018786</color>
+    <color name="colorPrimary">@color/wembly</color>
     <color name="colorSecondary">#01b4e4</color>
     <color name="colorTertiary">#90cea1</color>
     <color name="colorPrimaryDark">#FF6200EE</color>
@@ -13,5 +13,7 @@
     <color name="purple_200">#FFBB86FC</color>
     <color name="white">#FFFFFFFF</color>
     <color name="wembly">#0C1E72</color>
+    <color name="tab_color_selected">#FFFFFF</color>
+    <color name="tab_color_unselected">#707070</color>
 
 </resources>

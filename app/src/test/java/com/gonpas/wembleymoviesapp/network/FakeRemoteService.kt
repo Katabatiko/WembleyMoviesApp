@@ -10,6 +10,7 @@ object FakeRemoteService: TmdbApiService {
     private val configuration: Configuration
     private val results: Array<MovieDto>
     var actualMoviesDto: MoviesListDto
+    var person1: PersonDto
 
 
 
@@ -61,7 +62,203 @@ object FakeRemoteService: TmdbApiService {
         voteAverage = 8.8f,
         voteCount = 535
     )
+    private val movieDto4 = MovieDto(
+        adult = false,
+        backdropPath = "/3CxUndGhUcZdt1Zggjdb2HkLLQX.jpg",
+        genre_ids = arrayOf(
+                        28,
+                        12,
+                        878
+                    ),
+        id = 640146,
+        originalLanguage = "en",
+        originalTitle = "Ant-Man and the Wasp: Quantumania",
+        overview = "La pareja de superhéroes Scott Lang y Hope van Dyne regresa para continuar sus aventuras",
+        popularity = 4665.438f,
+        posterPath = "/jTNYlTEijZ6c8Mn4gvINOeB2HWM.jpg",
+        releaseDate = "2023-02-15",
+        title = "Ant-Man y la Avispa: Quantumanía",
+        video = false,
+        voteAverage = 6.573f,
+        voteCount = 2301
+    )
 
+    private val evangeline = PersonDto(
+        adult = false,
+        alsoKnownAs = arrayOf(
+            "에반젤린 릴리",
+            "Εβάντζελιν Λίλι",
+            "Nicole Evangeline Lilly",
+            " エヴァンジェリン・リリー",
+            "Еванджелін Ліллі"
+        ),
+        biography = "Nicole Evangeline Lilly (3 de agosto de 1979),​ conocida artísticamente como Evangeline Lilly, es una actriz y escritora canadiense. Logró popularidad por su papel de Kate Austen en la serie de televisión Lost (2004-2010), por la que obtuvo un Premio del Sindicato de Actores y recibió una nominación al Globo de Oro.​ También es reconocida por sus interpretaciones de Connie James en The Hurt Locker (2008), Hope Van Dyne en Ant-Man and the Wasp (2018), Bailey Tallet en Real Steel (2011) y Tauriel en la serie fílmica de El Hobbit.",
+        birthday = "1979-08-03",
+        deathday = null,
+        gender = 1,
+        homepage = "https://evangeline-lilly.com/",
+        id = 19034,
+        imdbId = "nm1431940",
+        knowForDepartment = "Acting",
+        name = "Evangeline Lilly",
+        placeOfBirth = "Fort Saskatchewan, Alberta, Canada",
+        popularity = 39.19f,
+        profilePath = "/fRbXVt9fhz6ndPhF1lRA92VxUDk.jpg"
+    )
+    private val nobody = PersonDto(
+        adult = false,
+        alsoKnownAs = arrayOf(
+            "Fulano",
+            "Mengano",
+            "Zutano"
+        ),
+        biography = "Tedio nacio en Madrid (España) en los años 60 del paado siglo",
+        birthday = "1964-02-19",
+        deathday = null,
+        gender = 1,
+        homepage = null,
+        id = 0,
+        imdbId = null,
+        knowForDepartment = "Acting",
+        name = "Tedio Plomez Sopor",
+        placeOfBirth = "Madrid, España",
+        popularity = 99.99f,
+        profilePath = null
+    )
+
+    val creditsDto = CreditsDto(
+        id = 640146,
+        cast = arrayOf(
+            ActoresDto(
+                adult = false,
+                gender = 2,
+                id = 22226,
+                knownForDepartment = "Acting",
+                name = "Paul Rudd",
+                originalName = "Paul Rudd",
+                popularity = 42.975f,
+                profilePath = "/8eTtJ7XVXY0BnEeUaSiTAraTIXd.jpg",
+                castId = 1,
+                character = "Scott Lang / Ant-Man",
+                creditId = "5da88f43a2423200177bf176",
+                order = 0
+            ),
+            ActoresDto(
+                adult =  false,
+                gender = 1,
+                id = 19034,
+                knownForDepartment = "Acting",
+                name = "Evangeline Lilly",
+                originalName = "Evangeline Lilly",
+                popularity = 39.19f,
+                profilePath = "/fRbXVt9fhz6ndPhF1lRA92VxUDk.jpg",
+                castId = 2,
+                character = "Hope van Dyne / The Wasp",
+                creditId = "5da88f59944a570019264e0e",
+                order = 1
+            ),
+            ActoresDto(
+                adult =  false,
+                gender = 1,
+                id = 1160,
+                knownForDepartment = "Acting",
+                name = "Michelle Pfeiffer",
+                originalName = "Michelle Pfeiffer",
+                popularity = 39.662f,
+                profilePath = "/oGUmQBU87QXAsnaGleYaAjAXSlj.jpg",
+                castId = 15,
+                character = "Janet van Dyne",
+                creditId = "5dbf376defe37c001383ed0d",
+                order = 4
+            ),
+            ActoresDto(
+                adult =  false,
+                gender = 2,
+                id = 3392,
+                knownForDepartment = "Acting",
+                name = "Michael Douglas",
+                originalName = "Michael Douglas",
+                popularity = 14.929f,
+                profilePath = "/kVYGPIZowzXLEQfAGUNOqKjAbBb.jpg",
+                castId = 16,
+                character = "Dr. Hank Pym",
+                creditId = "5dbf3786f1b5710010e7221c",
+                order = 5
+            )
+        ),
+        crew = arrayOf(
+            CrewDto(
+                adult = false,
+                gender = 2,
+                id = 7624,
+                knownForDepartment = "Writing",
+                name = "Stan Lee",
+                originalName = "Stan Lee",
+                popularity = 18.066f,
+                profilePath = "/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg",
+                creditId = "5da88fdbe6d3cc0018b04e35",
+                department = "Writing",
+                job = "Characters"
+            ),
+            CrewDto(
+                adult = false,
+                gender = 2,
+                id = 9341,
+                knownForDepartment = "Camera",
+                name = "Bill Pope",
+                originalName = "Bill Pope",
+                popularity = 1.679f,
+                profilePath = "/kpakvuSrk1D9D8WMt5SOi4Rs2EV.jpg",
+                creditId = "6289717ae004a66f32b15131",
+                department = "Camera",
+                job = "Director of Photography"
+            ),
+            CrewDto(
+                adult = false,
+                gender = 2,
+                id = 59026,
+                knownForDepartment = "Directing",
+                name = "Peyton Reed",
+                originalName = "Peyton Reed",
+                popularity = 6.278f,
+                profilePath = "/aucXNycAtFREMIKr6ikmHvd2Mmp.jpg",
+                creditId = "5dbc9866d388ae0016d85970",
+                department = "Directing",
+                job = "Director"
+            ),
+            CrewDto(
+                adult = false,
+                gender = 2,
+                id = 18866,
+                knownForDepartment = "Writing",
+                name = "Jack Kirby",
+                originalName = "Jack Kirby",
+                popularity = 4.382f,
+                profilePath = "/ihhR019gL1WrXdSQNJITAY6dont.jpg",
+                creditId = "5dbd321c9638640016e10f30",
+                department = "Writing",
+                job = "Characters"
+            ),
+            CrewDto(
+                adult = false,
+                gender = 2,
+                id = 23486,
+                knownForDepartment = "Sound",
+                name = "Christophe Beck",
+                originalName = "Christophe Beck",
+                popularity = 1.971f,
+                profilePath = "/n3U0OPETTZGTx4mgsrryARKphR4.jpg",
+                creditId = "62ca36d1d705940051fd2ff4",
+                department = "Sound",
+                job = "Original Music Composer"
+            )
+        )
+    )
+    val creditsDtoEmpty = CreditsDto(
+        id = 0,
+        cast = arrayOf<ActoresDto>(),
+        crew = arrayOf<CrewDto>()
+    )
 
 
     init {
@@ -85,13 +282,14 @@ object FakeRemoteService: TmdbApiService {
             //        "status","tagline","title","translations","tvdb_id","tvrage_id","type","video","videos"
         )
 
-        results = arrayOf(movieDto1, movieDto3, movieDto2)
+        results = arrayOf(movieDto1, movieDto3, movieDto2, movieDto4)
         actualMoviesDto = MoviesListDto(
             1,
             results,
             1,
             3
         )
+        person1 = evangeline
     }
 
     override suspend fun getToken(api_key: String): RequestedToken {
@@ -133,5 +331,21 @@ object FakeRemoteService: TmdbApiService {
             totalPages = 1,
             totalResults = newResult.size
         )
+    }
+
+    override suspend fun getMovieCredits(
+        movie_id: Int,
+        api_key: String,
+        language: String
+    ): CreditsDto {
+        delay(SERVICE_LATENCY)
+        return  if (movie_id == 640146)     creditsDto
+                else                        creditsDtoEmpty
+    }
+
+    override suspend fun getPerson(person_id: Int, api_key: String, language: String): PersonDto {
+        delay(SERVICE_LATENCY)
+        return  if (person_id == 19034) person1
+                else                    nobody
     }
 }

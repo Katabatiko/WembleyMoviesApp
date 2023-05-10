@@ -1,9 +1,12 @@
-package com.gonpas.wembleymoviesapp.tabs
+package com.gonpas.wembleymoviesapp.ui.tabs
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.gonpas.wembleymoviesapp.domain.DomainFilm
 import com.gonpas.wembleymoviesapp.getOrAwaitValue
+import com.gonpas.wembleymoviesapp.network.asListDomainModel
 import com.gonpas.wembleymoviesapp.repository.FakeMoviesRepository
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +50,7 @@ internal class MoviesViewModelTest{
     @Before
     fun setupViewModel(){
         moviesRepository = FakeMoviesRepository()
-        moviesViewModel = MoviesViewModel(ApplicationProvider.getApplicationContext(), moviesRepository)
+        moviesViewModel = MoviesViewModel(ApplicationProvider.getApplicationContext(), moviesRepository, SavedStateHandle())
     }
 
     @After
@@ -58,25 +61,27 @@ internal class MoviesViewModelTest{
 
     @Test
     fun getConfigurationTest(){
-       val value = moviesViewModel.configuration.getOrAwaitValue()
+       val value = moviesViewModel._configuration.getOrAwaitValue()
 
        assertThat(value, not(nullValue()))
     }
     @Test
     fun downloadMoviesTest() {
-       val movies = moviesViewModel.popularMoviesList.getOrAwaitValue()
+        val value = moviesViewModel.getConf().getOrAwaitValue()
+        assertThat(value, not(nullValue()))
+        val movies = moviesViewModel.getPops().getOrAwaitValue()
 
-       assertThat(movies, (not(emptyList())))
-       assertEquals(3, movies.size)
-       assertEquals("El test de Navalosa", movies[2].title)
+        assertThat(movies, (not(emptyList())))
+        assertEquals(4, movies.size)
+        assertEquals("El test de Navalosa", movies[2].title)
         // control de la construccion de la url de la imagen
-       assertEquals("https://image.tmdb.org/t/p/w185/postername.jpg", movies[0].imgUrl)
+        assertEquals("https://image.tmdb.org/t/p/w185/postername.jpg", movies[0].imgUrl)
     }
 
     @Test
     fun saveFavTest(){
-        val movies = moviesViewModel.popularMoviesList.getOrAwaitValue()
-        assertThat(movies.size, `is`(3))
+        val movies = moviesViewModel.getPops().getOrAwaitValue()
+        assertThat(movies.size, `is`(4))
 
         moviesViewModel.saveFavMovie(movies[0])
         val value = moviesViewModel.favsMovies.getOrAwaitValue()
@@ -88,8 +93,8 @@ internal class MoviesViewModelTest{
     fun searchMoviesTest(){
         moviesViewModel.searchMovies("test")
         assertEquals(2, moviesViewModel.nextFoundPage)
-        val value = moviesViewModel.foundMovies.getOrAwaitValue()
-        assertEquals(2, value.size )
+        val value = moviesViewModel.getFound().getOrAwaitValue()
+        assertEquals(2, value?.size )
     }
 
     @Test
@@ -111,4 +116,44 @@ internal class MoviesViewModelTest{
         assertThat(value[0].title, `is`("Vientos del norte"))
 
     }
+
+
+    @Test
+    fun getCredits(){
+        moviesViewModel.getCredits(
+            640146,
+            "Ant-Man and the Wasp: Quantumania",
+            "La pareja de superhéroes Scott Lang y Hope van Dyne regresa para continuar sus aventuras"
+        )
+        var film = moviesViewModel.getFilm().getOrAwaitValue()
+
+        assertThat(film!!.title, `is`("Ant-Man and the Wasp: Quantumania"))
+        assertThat(film.overview, `is`("La pareja de superhéroes Scott Lang y Hope van Dyne regresa para continuar sus aventuras"))
+        assertThat(film.cast[0].name, `is`("Paul Rudd"))
+        assertThat(film.crew[0].job, `is`("Characters"))
+        assertThat(film.crew[0].name, `is`("Stan Lee"))
+
+        moviesViewModel.getCredits(22, "Null film", "Nada que contar")
+        film = moviesViewModel.getFilm().getOrAwaitValue()
+        assertThat(film!!.title, `is`("Null film"))
+        assertThat(film.overview, `is`("Nada que contar"))
+        assertThat(film.cast.size, `is`(0))
+        assertThat(film.crew.size, `is`(0))
+    }
+
+    @Test
+    fun getPersonData(){
+        moviesViewModel.getPersonData(19034)
+        var person = moviesViewModel.getPerson().getOrAwaitValue()
+
+        assertThat(person!!.name, `is`("Evangeline Lilly"))
+        assertThat(person.placeOfBirth, `is`("Fort Saskatchewan, Alberta, Canada"))
+
+        moviesViewModel.getPersonData(22)
+        person = moviesViewModel.getPerson().getOrAwaitValue()
+
+        assertThat(person!!.name, `is`("Tedio Plomez Sopor"))
+        assertThat(person.placeOfBirth, `is`("Madrid, España"))
+    }
+
 }

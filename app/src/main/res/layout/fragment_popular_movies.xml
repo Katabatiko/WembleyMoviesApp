@@ -6,14 +6,15 @@
     <data>
         <variable
             name="viewModel"
-            type="com.gonpas.wembleymoviesapp.tabs.MoviesViewModel" />
+            type="com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModel" />
         <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/popularFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".tabs.popular.PopularMoviesFragment">
+        tools:context=".ui.tabs.popular.PopularMoviesFragment">
 
 
         <android.widget.SearchView

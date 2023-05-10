@@ -1,4 +1,4 @@
-package com.gonpas.wembleymoviesapp.tabs.favourites
+package com.gonpas.wembleymoviesapp.ui.tabs.favourites
 
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
@@ -8,20 +8,20 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import com.gonpas.wembleymoviesapp.R
 import com.gonpas.wembleymoviesapp.ServiceLocator
 import com.gonpas.wembleymoviesapp.database.FakeAndroidTestLocalDataSource
 import com.gonpas.wembleymoviesapp.repository.FakeAndroidTestRepository
 import com.gonpas.wembleymoviesapp.utils.MoviesAdapter
 import com.gonpas.wembleymoviesapp.utils.clickItemChildWithId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import androidx.test.filters.MediumTest
 import org.hamcrest.Matchers.not
-import org.junit.After
-import org.junit.Before
 
 import org.junit.Assert.*
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -76,17 +76,12 @@ class FavoritesMoviesFragmentTest {
     }
 
     @Test
-    fun clickDelFav_removeFav() {
+    fun clickDelFab_removeFav() {
         launchFragmentInContainer<FavoritesMoviesFragment>(null, R.style.Theme_WembleyMoviesApp)
 
 
         onView(withId(R.id.list_fav_movies))
-            .perform(
-                RecyclerViewActions
-                    .scrollTo<MoviesAdapter.MovieViewHolder>(
-                        hasDescendant(withText(testMovie.title))
-                    )
-            )
+            .check(matches(hasDescendant(withText(testMovie.title))))
 
         onView(withId(R.id.list_fav_movies))
             .perform(
@@ -110,12 +105,7 @@ class FavoritesMoviesFragmentTest {
             )
 
         onView(withId(R.id.list_fav_movies))
-            .perform(
-                RecyclerViewActions
-                    .scrollTo<MoviesAdapter.MovieViewHolder>(
-                        not(hasDescendant(withText(testMovie.title)))
-                    )
-            )
+            .check(matches(not(hasDescendant(withText(testMovie.title)))))
         Thread.sleep(1000)
     }
 
@@ -151,6 +141,21 @@ class FavoritesMoviesFragmentTest {
             .perform(
                 click()
             )
+
+        Thread.sleep(500)
+        onView(withId(R.id.list_fav_movies))
+            .perform(
+                RecyclerViewActions
+                    .actionOnItemAtPosition<MoviesAdapter.MovieViewHolder>(
+                        0,
+                        clickItemChildWithId(R.id.floatingActionButton)
+                    )
+            )
+        onView(withText(R.string.confirmar))
+            .perform(
+                click()
+            )
+
 
         onView(withId(R.id.aviso_no_hay))
             .check(matches(isDisplayed()))

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModel" />
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/favoritesFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.tabs.popular.PopularMoviesFragment">
+
+
+        <!--android:visibility="@{ viewModel.noHayFavorites ? View.VISIBLE : View.GONE }"-->
+        <TextView
+            android:id="@+id/aviso_no_hay"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/no_hay_favoritas"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/list_fav_movies"
+            app:layout_constraintEnd_toEndOf="@+id/list_fav_movies"
+            app:layout_constraintStart_toStartOf="@+id/list_fav_movies"
+            app:layout_constraintTop_toTopOf="@+id/list_fav_movies"
+            app:layout_constraintVertical_bias="0.050000012" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_fav_movies"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/movie_item" />
+
+        <!--<ImageView
+            android:id="@+id/status_img_fav"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:contentDescription="@string/downloading"
+            app:apiStatus="@{ viewModel.status }"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ImageContrastCheck" />-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

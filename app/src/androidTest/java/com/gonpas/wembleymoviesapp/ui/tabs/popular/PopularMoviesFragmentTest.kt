@@ -1,4 +1,4 @@
-package com.gonpas.wembleymoviesapp.tabs.popular
+package com.gonpas.wembleymoviesapp.ui.tabs.popular
 
 import com.gonpas.wembleymoviesapp.R
 import androidx.fragment.app.testing.launchFragmentInContainer
@@ -14,7 +14,7 @@ import com.gonpas.wembleymoviesapp.ServiceLocator
 import com.gonpas.wembleymoviesapp.WembleyMoviesApp
 import com.gonpas.wembleymoviesapp.network.FakeAndroidTestRemoteService.movieDto1
 import com.gonpas.wembleymoviesapp.repository.FakeAndroidTestRepository
-import com.gonpas.wembleymoviesapp.tabs.popular.PopularMoviesFragment.*
+import com.gonpas.wembleymoviesapp.ui.tabs.popular.PopularMoviesFragment.*
 import com.gonpas.wembleymoviesapp.utils.ItemChildViewVisibilityAssertion.Companion.isItemChildViewNotVisible
 import com.gonpas.wembleymoviesapp.utils.ItemChildViewVisibilityAssertion.Companion.isItemChildViewVisible
 import com.gonpas.wembleymoviesapp.utils.ItemChildTextViewCorrectText.Companion.isTextItemChildCorrect

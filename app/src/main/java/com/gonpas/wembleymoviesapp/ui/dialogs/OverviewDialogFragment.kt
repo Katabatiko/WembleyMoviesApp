@@ -1,4 +1,4 @@
-package com.gonpas.wembleymoviesapp.utils
+package com.gonpas.wembleymoviesapp.ui.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -20,7 +20,7 @@ class OverviewDialogFragment(val title: String, private val msg: String) : Dialo
         } ?: throw java.lang.IllegalStateException("¡¡¡ Activity null !!!")
     }
 
-    fun get() : OverviewDialogFragment{
+    fun get() : OverviewDialogFragment {
         return this
     }
 }

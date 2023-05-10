@@ -6,6 +6,8 @@
     <string name="powered_by">Usando la potencia de:</string>
     <string name="calificacion">Calificación TMDB: %s</string>
     <string name="fecha_estreno">Fecha estreno: %s/%s/%s</string>
+    <string name="birthday">Fecha de nacimiento: %s/%s/%s</string>
+    <string name="deathday">Fecha de defunción: %s/%s/%s</string>
     <string name="favorite">Añadir a favoritos</string>
     <string name="eliminar">¿Seguro de eliminar \'%s\' de favoritas?</string>
     <string name="confirmar">Confirmar</string>
@@ -20,8 +22,8 @@
     <string name="encontradas">encontradas</string>
 
 
-    <string name="first_fragment_label">Películas populares</string>
-    <string name="second_fragment_label">Películas favoritas</string>
+    <string name="first_fragment_label">Populares</string>
+    <string name="second_fragment_label">Favoritas</string>
     <string name="pop_tab">Pestaña de películas populares</string>
     <string name="fav_tab">Pestaña de películas favoritas</string>
 
@@ -31,4 +33,14 @@
     <string name="presenta">Presenta:</string>
     <string name="logo_wembley_studios">Logo de Wembley Studios</string>
     <string name="no_hay_favoritas">No hay favoritas</string>
+
+    <string name="director">Director: %s</string>
+    <string name="banda_sonora">Banda sonora original: %s</string>
+    <string name="guion">Guion: %s</string>
+    <string name="director_fotografia">Director de fotografía: %s</string>
+    <string name="historia_original">Historia original: %s</string>
+
+    <string name="reparto">Reparto</string>
+    <string name="mas">Más …</string>
+    <string name="biografia">Biografía …</string>
 </resources>

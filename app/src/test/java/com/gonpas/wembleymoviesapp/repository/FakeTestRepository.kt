@@ -23,6 +23,14 @@ class FakeMoviesRepository(): InterfaceMoviesRepository {
         return remoteSourceData.searchMovie(query= query, page = page)
     }
 
+    override suspend fun getMovieCredits(movieId: Int): CreditsDto {
+        return remoteSourceData.getMovieCredits(movieId)
+    }
+
+    override suspend fun getPerson(personId: Int): PersonDto {
+        return remoteSourceData.getPerson(personId)
+    }
+
     override suspend fun getConfiguration(): Configuration {
         return remoteSourceData.getConfiguration()
     }

@@ -33,14 +33,14 @@ fun String.smartTruncate(length: Int): String {
     return builder.toString()
 }
 
-
-class OverviewListener(val clickListener: (movie: DomainMovie) -> Unit){
-    fun onClick(movie: DomainMovie) = clickListener(movie)
-}
-class FabListener(val clickListener: (movie: DomainMovie) -> Unit){
-    fun onClick(movie: DomainMovie) = clickListener(movie)
-}
-
 fun localNumberFormat(number: Int): String{
     return NumberFormat.getInstance().format(number)
+}
+
+
+class MovieListener(val clickListener: (movie: DomainMovie) -> Unit){
+    fun onClick(movie: DomainMovie) = clickListener(movie)
+}
+class PersonListener(val clickListener: (personId: Int) -> Unit){
+    fun onClick(personId: Int) = clickListener(personId)
 }

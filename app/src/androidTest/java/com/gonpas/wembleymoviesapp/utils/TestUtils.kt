@@ -11,6 +11,8 @@ import androidx.test.espresso.matcher.ViewMatchers
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
 
+val casiUrl = "http://image.tmdb.org/t/p/w185/%s"
+
 class ItemChildViewVisibilityAssertion {
     companion object {
         /**

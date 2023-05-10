@@ -5,6 +5,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import com.gonpas.wembleymoviesapp.database.MoviesDao
 import com.gonpas.wembleymoviesapp.database.MoviesDatabase
+import com.gonpas.wembleymoviesapp.database.getDatabase
 import com.gonpas.wembleymoviesapp.network.TmdbApi
 import com.gonpas.wembleymoviesapp.repository.InterfaceMoviesRepository
 import com.gonpas.wembleymoviesapp.repository.MoviesRepository
@@ -46,11 +47,6 @@ object ServiceLocator {
     }
 
     private fun createDatabase(context: Context): MoviesDatabase{
-        val result = Room.databaseBuilder(
-            context.applicationContext,
-            MoviesDatabase::class.java, "movies"
-        ).build()
-        database = result
-        return result
+        return getDatabase(context)
     }
 }

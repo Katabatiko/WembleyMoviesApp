@@ -10,14 +10,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gonpas.wembleymoviesapp.databinding.FavItemBinding
 import com.gonpas.wembleymoviesapp.databinding.MovieItemBinding
 import com.gonpas.wembleymoviesapp.domain.DomainMovie
-import com.gonpas.wembleymoviesapp.tabs.MoviesViewModel
+import com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModel
 
 private const val TAG = "xxMAdapter"
 
 class MoviesAdapter(
     private val viewModel: MoviesViewModel,
-    private val fabClickListener: FabListener,
-    private val overviewListener: OverviewListener,
+    private val filmListener: MovieListener,
+    private val fabClickListener: MovieListener,
+    private val overviewListener: MovieListener,
     private val movieType: MovieType
 ): ListAdapter<DomainMovie, MoviesAdapter.MovieViewHolder>(MovieDiffCallback){
 
@@ -37,6 +38,13 @@ class MoviesAdapter(
                 holderBinding.movie = item
                 holderBinding.viewModel = viewModel
 
+                holderBinding.poster.setOnClickListener{
+                    filmListener.onClick(item)
+                }
+                holderBinding.more.setOnClickListener{
+                    filmListener.onClick(item)
+                }
+
                 holderBinding.overview.setOnClickListener{
                     overviewListener.onClick(item)
                 }
@@ -51,6 +59,13 @@ class MoviesAdapter(
                 val holderBinding = holder.binding as MovieItemBinding
                 holderBinding.movie = item
                 holderBinding.viewModel = viewModel
+
+                holderBinding.poster.setOnClickListener{
+                    filmListener.onClick(item)
+                }
+                holderBinding.mas.setOnClickListener{
+                    filmListener.onClick(item)
+                }
 
                 holderBinding.overview.setOnClickListener{
                     overviewListener.onClick(item)
@@ -67,7 +82,7 @@ class MoviesAdapter(
     }
 
 
-    class MovieViewHolder(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root){
+    class MovieViewHolder private constructor(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root){
         companion object{
             fun from(parent: ViewGroup, viewType: Int): MovieViewHolder{
                 val layoutInflater = LayoutInflater.from(parent.context)

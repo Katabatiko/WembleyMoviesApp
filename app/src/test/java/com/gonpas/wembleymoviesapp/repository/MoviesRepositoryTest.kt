@@ -11,7 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import com.gonpas.wembleymoviesapp.utils.casiUrl
 import kotlinx.coroutines.withContext
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
@@ -32,14 +32,9 @@ class MoviesRepositoryTest {
 
 
     val testDispatcher = UnconfinedTestDispatcher()
-    @Before
-    fun setupDispatcher() {
-        Dispatchers.setMain(testDispatcher)
-    }
 
     @Before
     fun setUp() {
-        val testDispatcher = UnconfinedTestDispatcher()
         repository = MoviesRepository(FakeRemoteService, FakeLocalDataSource(), testDispatcher )
     }
 
@@ -61,7 +56,7 @@ class MoviesRepositoryTest {
     fun searchMovie() = runTest {
         withContext(testDispatcher) {
             val initValue = repository.downloadPopMovies(1).results
-            assertThat("3", `is`( initValue.size.toString()))
+            assertThat("4", `is`( initValue.size.toString()))
             val value = repository.searchMovieFromRemote("norte",1).results
             assertThat("1", `is`( value.size.toString()))
         }
@@ -76,13 +71,13 @@ class MoviesRepositoryTest {
     @Test
     fun getMoviesFromDb() = runTest{
         val movies = repository.downloadPopMovies(1).results
-        assertThat("3", `is`( movies.size.toString()))
+        assertThat("4", `is`( movies.size.toString()))
     }
 
     @Test
     fun insertFavMovie() = runTest{
         val movies = repository.downloadPopMovies(1).results.asList()
-            .asListDomainMovies("http://image.tmdb.org/t/p/","w185")
+            .asListDomainMovies(casiUrl)
         repository.insertFavMovie(movies[0].asMovieDb())
         val value = repository.getMoviesFromDb().value
         TestCase.assertEquals(3, value?.size ?: 9)
@@ -93,5 +88,34 @@ class MoviesRepositoryTest {
         repository.removeFavMovie(100)
         val value = repository.getMoviesFromDb().value
         TestCase.assertEquals(1, value?.size ?: 9)
+    }
+
+    @Test
+    fun getMovieCredits() = runTest {
+        withContext(testDispatcher) {
+            var credits = repository.getMovieCredits(640146)
+            assertThat(credits.cast[0].name, `is`("Paul Rudd"))
+            val director = credits.crew.filter {
+                it.job == "Director"
+            }[0]
+            assertThat(director.name, `is`("Peyton Reed"))
+
+            credits = repository.getMovieCredits(10)
+            assertThat(credits.crew.size, `is`(0))
+            assertThat(credits.cast.size, `is`(0))
+        }
+    }
+
+    @Test
+    fun getPerson() = runTest {
+        withContext(testDispatcher){
+            var person = repository.getPerson(19034)
+            assertThat(person.name, `is`("Evangeline Lilly"))
+            assertThat(person.placeOfBirth, `is`("Fort Saskatchewan, Alberta, Canada"))
+
+            person = repository.getPerson(111)
+            assertThat(person.name, `is`("Tedio Plomez Sopor"))
+            assertThat(person.popularity, `is`(99.99f))
+        }
     }
 }

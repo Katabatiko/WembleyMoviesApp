@@ -10,14 +10,15 @@ abstract class MoviesDatabase : RoomDatabase(){
     abstract val movieDao: MoviesDao
 }
 
-private lateinit var INSTANCE: MoviesDatabase
+internal lateinit var INSTANCE: MoviesDatabase
 
 fun getDatabase(context: Context): MoviesDatabase {
     if (!::INSTANCE.isInitialized){
-        INSTANCE = Room.databaseBuilder(context.applicationContext,
-        MoviesDatabase::class.java,
-        "movies")
-            .build()
+        INSTANCE = Room.databaseBuilder(
+            context.applicationContext,
+            MoviesDatabase::class.java,
+            "movies"
+        ).build()
     }
     return INSTANCE
 }

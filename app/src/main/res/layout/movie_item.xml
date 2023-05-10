@@ -9,7 +9,7 @@
             type="com.gonpas.wembleymoviesapp.domain.DomainMovie" />
         <variable
             name="viewModel"
-            type="com.gonpas.wembleymoviesapp.tabs.MoviesViewModel" />
+            type="com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModel" />
         <import type="android.view.View" />
     </data>
 
@@ -37,7 +37,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="@{ movie.title }"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintEnd_toEndOf="parent"
@@ -49,31 +49,48 @@
             android:id="@+id/overview"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
             android:text="@{ movie.shortOverview }"
+            app:layout_constraintBottom_toTopOf="@+id/voteAverageTv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/poster"
             app:layout_constraintTop_toBottomOf="@+id/releaseDate" />
 
         <TextView
-            android:id="@+id/voteAverageTv"
+            android:id="@+id/mas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@string/mas"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/poster"
+            app:layout_constraintTop_toBottomOf="@+id/overview" />
+
+        <TextView
+            android:id="@+id/voteAverageTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
+            android:textAlignment="viewEnd"
             app:calificacion="@{ movie.voteAverage }"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/poster" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/mas"
+            app:layout_constraintTop_toBottomOf="@+id/overview" />
 
         <TextView
             android:id="@+id/releaseDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="16dp"
-            app:dateToLocal="@{ movie.releaseDate }"
+            app:releaseDateToLocal="@{ movie.releaseDate }"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.85"
+            app:layout_constraintStart_toEndOf="@+id/poster"
             app:layout_constraintTop_toBottomOf="@+id/titulo" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
