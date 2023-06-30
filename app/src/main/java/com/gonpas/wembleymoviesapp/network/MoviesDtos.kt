@@ -220,15 +220,15 @@ data class PersonDto(
 )
 fun PersonDto.asDomainModel(casiUrl: String): DomainPerson{
     return DomainPerson(
-        birthday    = this.birthday,
-        deathday    = this.deathday,
-        id          = this.id,
-        name        = this.name,
-        alsoKnownAs = this.alsoKnownAs,
-        biography   = this.biography,
-        placeOfBirth = this.placeOfBirth,
-        profilePath = casiUrl.format(this.profilePath),
-        imdbId      = this.imdbId,
-        homepage    = this.homepage
-    )
+                birthday    = this.birthday,
+                deathday    = this.deathday,
+                id          = this.id,
+                name        = this.name,
+                alsoKnownAs = this.alsoKnownAs,
+                biography   = this.biography,
+                placeOfBirth = this.placeOfBirth,
+                profilePath = casiUrl.format(this.profilePath),
+                imdbId      = this.imdbId,
+                homepage    = this.homepage
+            )
 }

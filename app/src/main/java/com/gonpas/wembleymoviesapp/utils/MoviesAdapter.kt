@@ -86,10 +86,11 @@ class MoviesAdapter(
         companion object{
             fun from(parent: ViewGroup, viewType: Int): MovieViewHolder{
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding :ViewDataBinding = when(viewType) {
-                    2 -> FavItemBinding.inflate(layoutInflater, parent, false)
-                    else -> MovieItemBinding.inflate(layoutInflater, parent, false)
-                }
+                val binding :ViewDataBinding =
+                    when(viewType) {
+                        2 -> FavItemBinding.inflate(layoutInflater, parent, false)
+                        else -> MovieItemBinding.inflate(layoutInflater, parent, false)
+                    }
                 return MovieViewHolder(binding)
             }
         }

@@ -2,14 +2,13 @@ package com.gonpas.wembleymoviesapp.database
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.gonpas.wembleymoviesapp.domain.DomainMovie
 
 class FakeLocalDataSource: MoviesDao {
 
     private val movieDb1 = MovieDb(
         movieId = 100,
         title = "El test del algoritmo",
-        overview = "Probando las funcionalidades del PopularMoviesViewModel para su lanzamiento a producción.",
+        overview = "Probando las funcionalidades de Room.",
         releaseDate = "2023-04-08",
         backdropPath = null,
         imgUrl = null,
@@ -29,17 +28,20 @@ class FakeLocalDataSource: MoviesDao {
         voteCount = 535
     )
 
-    private val _observableMovies = MutableLiveData<List<MovieDb>>()
+    private var movies = listOf<MovieDb>()
+    private var _observableMovies = MutableLiveData<List<MovieDb>>()
 
     init {
-        _observableMovies.value = listOf(
+        movies = listOf(
             movieDb1,
             movieDb2
         )
+        refreshObservableMovies()
     }
 
     override fun insertMovie(movie: MovieDb) {
-        _observableMovies.value = _observableMovies.value!!.plus(movie)
+        movies = movies.plus(movie)
+        refreshObservableMovies()
     }
 
     override fun getFavsMovies(): LiveData<List<MovieDb>> {
@@ -47,8 +49,13 @@ class FakeLocalDataSource: MoviesDao {
     }
 
     override suspend fun removeMovieFromDb(key: Int) {
-        _observableMovies.value = _observableMovies.value!!.filterNot {
+        movies = movies.filterNot {
             it.movieId == key
         }
+        refreshObservableMovies()
+    }
+
+    private fun refreshObservableMovies() {
+        _observableMovies.postValue(movies)
     }
 }

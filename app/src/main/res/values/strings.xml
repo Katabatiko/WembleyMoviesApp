@@ -43,4 +43,6 @@
     <string name="reparto">Reparto</string>
     <string name="mas">Más …</string>
     <string name="biografia">Biografía …</string>
+    <string name="msg_no_connection">Sin acceso a Internet</string>
+    <string name="person_image">Fotografía del intérprete</string>
 </resources>

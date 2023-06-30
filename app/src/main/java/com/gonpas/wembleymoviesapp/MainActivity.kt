@@ -4,25 +4,45 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager2.widget.ViewPager2
 import com.gonpas.wembleymoviesapp.databinding.ActivityMainBinding
-import com.gonpas.wembleymoviesapp.domain.DomainFilm
-import com.gonpas.wembleymoviesapp.ui.tabs.movie.MovieFragment
 import com.gonpas.wembleymoviesapp.utils.DiffPagerAdapter
 import com.gonpas.wembleymoviesapp.utils.DiffPagerAdapter.PagerFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
+@VisibleForTesting
 lateinit var pager: ViewPager2
 
 private const val TAG = "xxMa"
 
-private lateinit var tab: TabLayout
+lateinit var tab: TabLayout
 private lateinit var adapter: DiffPagerAdapter
 private var selectedItem = 0
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+
+
+    /*private var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val notConnected = intent.getBooleanExtra(
+                ConnectivityManager
+                .EXTRA_NO_CONNECTIVITY, false)
+            if (notConnected) {
+                disconnected()
+            } else {
+                connected()
+            }
+        }
+    }*/
+
+//    private lateinit var imgNoInternet: ImageView
+//    private lateinit var msgNoInternet: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +80,21 @@ class MainActivity : AppCompatActivity() {
             }
         }.attach()
 
+//        imgNoInternet = binding.noInternetImg
+//        msgNoInternet = binding.noInternetMsg
     }
+
+    /*override fun onStart() {
+        super.onStart()
+        registerReceiver(broadcastReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(broadcastReceiver)
+    }*/
+
+
 
     override fun onPause() {
         super.onPause()
@@ -72,32 +106,44 @@ class MainActivity : AppCompatActivity() {
         outState.putInt("selectedItem", selectedItem)
     }
 
-    fun generateInitialPagerFragments(): MutableList<PagerFragment>{
-        return mutableListOf(PagerFragment(0, "f0", null),
-        PagerFragment(1,"f1",null))
+    private fun generateInitialPagerFragments(): MutableList<PagerFragment>{
+        return mutableListOf(
+            PagerFragment(0, "f0"),
+            PagerFragment(1,"f1")
+        )
     }
 
-    companion object {
-        fun addOrReplaceMovieTab(bundle: Bundle){
-            if (adapter.fragmentManager.findFragmentByTag("f2") == null ||
-                (adapter.fragmentManager.findFragmentByTag("f2") as MovieFragment).film
-                != bundle.getParcelable("film")) {
-                selectedItem = 2
-            }
+//    private fun disconnected() {
+////        recyclerView.visibility = View.INVISIBLE
+//        // favoritos no requiere internet
+////        if (pager.currentItem != 1) {
+//            imgNoInternet.visibility = View.VISIBLE
+//            msgNoInternet.visibility = View.VISIBLE
+////        }
+//    }
 
-//            Log.d(TAG,"selectedItem: $selectedItem")
+//    private fun connected() {
+////        recyclerView.visibility = View.VISIBLE
+//        imgNoInternet.visibility = View.GONE
+//        msgNoInternet.visibility = View.GONE
+//    }
+
+
+
+    companion object {
+        fun addOrReplaceMovieTab(filmTitle: String){
+
+            selectedItem = 2
 
             val newFrags = listOf(
-                PagerFragment(0, "f0", null),
-                PagerFragment(1,"f1",null),
-                PagerFragment(2,"f2", bundle.getParcelable("film"))
+                PagerFragment(0, "f0"),
+                PagerFragment(1,"f1"),
+                PagerFragment(2,"f2", filmTitle)
             )
             adapter.setItems(newFrags)
 
             pager.currentItem = selectedItem
             tab.selectTab(tab.getTabAt(2), true)
-
-            val film = bundle.getParcelable<DomainFilm>("film")!!
 
 
             val tab0Text = tab.getTabAt(0)?.text
@@ -114,7 +160,7 @@ class MainActivity : AppCompatActivity() {
                         tab.setIcon(R.drawable.ic_favorite)
                     }
                     else -> {
-                        tab.text = film.title
+                        tab.text = filmTitle
                         tab.setIcon(R.drawable.ic_movie)
                     }
                 }

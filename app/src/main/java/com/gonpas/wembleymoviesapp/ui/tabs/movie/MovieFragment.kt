@@ -9,37 +9,26 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import com.gonpas.wembleymoviesapp.R
-import com.gonpas.wembleymoviesapp.WembleyMoviesApp
 import com.gonpas.wembleymoviesapp.databinding.FragmentMovieBinding
-import com.gonpas.wembleymoviesapp.domain.DomainFilm
 import com.gonpas.wembleymoviesapp.ui.dialogs.PersonDialogFragment
 import com.gonpas.wembleymoviesapp.ui.dialogs.PersonDialogFragment.DismissDialogListener
 import com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModel
-import com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModelFactory
 import com.gonpas.wembleymoviesapp.utils.CastAdapter
 import com.gonpas.wembleymoviesapp.utils.PersonListener
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "xxMf"
 
+@AndroidEntryPoint
 class MovieFragment : Fragment() {
 
-    lateinit var film: DomainFilm
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments.let {
-            film = it!!.getParcelable("film")!!
-        }
-    }
+    val viewModel by activityViewModels<MoviesViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        val app = requireNotNull(activity).application
-        val moviesRepository = (requireContext().applicationContext as WembleyMoviesApp).moviesRepository
-        val viewModel by activityViewModels<MoviesViewModel>{ MoviesViewModelFactory(app, moviesRepository, requireActivity()) }
+//        Log.d(TAG,"fragArgs: ${arguments?.toString() ?: "nulo"}")
 
         val binding: FragmentMovieBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie, container, false)
 
@@ -49,19 +38,18 @@ class MovieFragment : Fragment() {
             }
         )
         binding.casting.adapter = adapter
-        adapter.data = film.cast
 
-        binding.film = film
+        binding.film = viewModel.getFilm().value
+        adapter.data = viewModel.getFilm().value?.cast ?: listOf()
+
 
         viewModel.getPerson().observe(viewLifecycleOwner){
 //        viewModel.person.observe(viewLifecycleOwner){
-//            Log.d(TAG,"personObserver: ${it?.name ?: "nulo"}")
             if (it != null) {
                 val personDialog = PersonDialogFragment.newInstance(it, DismissDialogListener{
                     viewModel.resetPerson()
                 })
                 personDialog.show(requireActivity().supportFragmentManager, it.name)
-//                Log.d(TAG,"person state: ${viewModel.state.keys()}")
             }
         }
 
@@ -69,24 +57,14 @@ class MovieFragment : Fragment() {
     }
 
 
-    /*companion object {
+    companion object {
         private lateinit var INSTANCE: MovieFragment
 
-        fun getInstance(film: DomainFilm): MovieFragment{
-            if (!::INSTANCE.isInitialized) {
-                INSTANCE = MovieFragment().apply {
-                    arguments = Bundle().apply {
-                        putParcelable("film", film)
-                    }
-                }
-            } else {
-                INSTANCE.film = film
-            }
+        fun getInstance(): MovieFragment{
+            if (!::INSTANCE.isInitialized)
+                INSTANCE = MovieFragment()
+
             return INSTANCE
         }
-    }*/
-
-    fun getTitle(): String{
-        return film.title
     }
 }

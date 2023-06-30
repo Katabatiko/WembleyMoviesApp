@@ -1,8 +1,6 @@
 package com.gonpas.wembleymoviesapp.database
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [MovieDb::class], version = 1)
@@ -10,6 +8,7 @@ abstract class MoviesDatabase : RoomDatabase(){
     abstract val movieDao: MoviesDao
 }
 
+/*
 internal lateinit var INSTANCE: MoviesDatabase
 
 fun getDatabase(context: Context): MoviesDatabase {
@@ -21,4 +20,4 @@ fun getDatabase(context: Context): MoviesDatabase {
         ).build()
     }
     return INSTANCE
-}
+}*/

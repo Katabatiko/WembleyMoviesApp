@@ -1,14 +1,12 @@
 package com.gonpas.wembleymoviesapp.utils
 
 import android.util.Log
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
-import com.gonpas.wembleymoviesapp.domain.DomainFilm
 import com.gonpas.wembleymoviesapp.ui.tabs.movie.MovieFragment
 import com.gonpas.wembleymoviesapp.ui.tabs.favourites.FavoritesMoviesFragment
 import com.gonpas.wembleymoviesapp.ui.tabs.popular.PopularMoviesFragment
@@ -27,38 +25,22 @@ class DiffPagerAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        if (payloads.isNotEmpty()) {
-            when(holder.itemId.toInt()){
-                2 -> {
-                    val fragment = fragmentManager.findFragmentByTag("f2")
-                    // safe check, but fragment should not be null here
-                    if (fragment != null) {
-                        (fragment as MovieFragment).film = payloads[0] as DomainFilm
-                    } else {
-                        super.onBindViewHolder(holder, position, payloads)
-                    }
-                }
-                else -> super.onBindViewHolder(holder, position, payloads)
-            }
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
-        }
+//            Log.d(TAG,"payloads received: $payloads")
+
+        super.onBindViewHolder(holder, position, payloads)
     }
 
     override fun createFragment(position: Int): Fragment {
-//        Log.d(TAG, "Create fragment in diffpageradapter: position $position with ${fragmentManager.fragments.size} items")
+        Log.d(TAG, "Create fragment in diffpageradapter: position $position with ${fragmentManager.fragments.size} items")
         return when(position){
             0 -> {
-                PopularMoviesFragment.getInstance()
+                PopularMoviesFragment()
             }
             1 -> {
                 FavoritesMoviesFragment()
             }
             else -> {
-                val fragment = MovieFragment().apply {
-                    this.arguments = bundleOf("film" to items[2].film)
-                }
-                return fragment
+                MovieFragment()
             }
         }
     }
@@ -78,17 +60,17 @@ class DiffPagerAdapter(
         val callback = PagerDiffUtil(items, newItems)
         val diff = DiffUtil.calculateDiff(callback)
 
+        diff.dispatchUpdatesTo(this)
+
         items.clear()
         items.addAll(newItems)
-
-        diff.dispatchUpdatesTo(this)
     }
 
     data class PagerFragment(
         val fragId: Int,
         val fragTag: String,
-        var film: DomainFilm?
-    ): Fragment()
+        var filmTitle: String = ""
+    )
 }
 
 class PagerDiffUtil(
@@ -105,10 +87,11 @@ class PagerDiffUtil(
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].film == newList[newItemPosition].film
+        return oldList[oldItemPosition].filmTitle == newList[newItemPosition].filmTitle
     }
 
-    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
-        return newList[newItemPosition].film!!
-    }
+    /*override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
+        Log.d(TAG,"getPayload: ${newList[newItemPosition].filmTitle}")
+        return newList[newItemPosition].filmTitle
+    }*/
 }

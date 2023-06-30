@@ -16,18 +16,18 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
+            style="@style/WembleyTabLayoutStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:contentDescription="@string/fav_tab"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            style="@style/WembleyTabLayoutStyle"
             app:tabBackground="@color/colorPrimary"
-            app:tabMode="fixed"
             app:tabGravity="fill"
-            app:tabTextColor="@drawable/tab_selector"
-            app:tabIconTint="@drawable/tab_selector"/>
+            app:tabIconTint="@drawable/tab_selector"
+            app:tabMode="fixed"
+            app:tabTextColor="@drawable/tab_selector" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
@@ -36,7 +36,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tabs" />
+            app:layout_constraintTop_toBottomOf="@+id/tabs" >
+
+        </androidx.viewpager2.widget.ViewPager2>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -39,15 +39,16 @@
 
         <ImageView
             android:id="@+id/status_img"
-            android:layout_width="400dp"
-            android:layout_height="400dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:contentDescription="@string/downloading"
             app:apiStatus="@{ viewModel.status }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ImageContrastCheck" />
+            tools:ignore="ImageContrastCheck"
+            tools:srcCompat="@drawable/no_internet_connection" />
 
         <TextView
             android:id="@+id/noFound"

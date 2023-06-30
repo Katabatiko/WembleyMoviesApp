@@ -20,7 +20,7 @@ data class MovieDb constructor(
     val voteCount: Int
 )
 
-fun LiveData<List<MovieDb>>.asListDomainMovies(): LiveData<List<DomainMovie>>{
+fun LiveData<List<MovieDb>>.asLiveDataListDomainMovies(): LiveData<List<DomainMovie>>{
     return map { list ->
         list.map {
             DomainMovie(
@@ -36,5 +36,22 @@ fun LiveData<List<MovieDb>>.asListDomainMovies(): LiveData<List<DomainMovie>>{
                 fav = true
             )
         }
+    }
+}
+
+fun List<MovieDb>.asListDomainModel(): List<DomainMovie> {
+    return map {
+        DomainMovie(
+            backdropPath = it.backdropPath,
+            id = it.movieId,
+            title = it.title,
+            overview = it.overview,
+            imgUrl = it.imgUrl,
+            popularity = it.popularity,
+            releaseDate = it.releaseDate,
+            voteAverage = it.voteAverage,
+            voteCount = it.voteCount,
+            fav = true
+        )
     }
 }

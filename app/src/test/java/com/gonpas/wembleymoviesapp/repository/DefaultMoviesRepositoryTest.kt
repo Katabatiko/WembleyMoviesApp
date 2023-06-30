@@ -1,18 +1,20 @@
 package com.gonpas.wembleymoviesapp.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.gonpas.wembleymoviesapp.database.FakeLocalDataSource
 import com.gonpas.wembleymoviesapp.domain.asMovieDb
 import com.gonpas.wembleymoviesapp.network.FakeRemoteService
+import com.gonpas.wembleymoviesapp.network.StubTestRemoteService
 import com.gonpas.wembleymoviesapp.network.asListDomainMovies
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import com.gonpas.wembleymoviesapp.utils.casiUrl
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
@@ -20,9 +22,11 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
 @ExperimentalCoroutinesApi
-class MoviesRepositoryTest {
+@RunWith(AndroidJUnit4::class)
+class DefaultMoviesRepositoryTest {
 
     private lateinit var repository: MoviesRepository
 
@@ -31,11 +35,11 @@ class MoviesRepositoryTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
 
-    val testDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
-        repository = MoviesRepository(FakeRemoteService, FakeLocalDataSource(), testDispatcher )
+        repository = DefaultMoviesRepository(FakeRemoteService, FakeLocalDataSource(), testDispatcher )
     }
 
     @After
@@ -45,20 +49,23 @@ class MoviesRepositoryTest {
 
     @Test
     fun downloadPopMovies() = runTest {
-        withContext(testDispatcher) {
+        launch {
             val movies = repository.downloadPopMovies(1)
 
-            assertArrayEquals(movies.results, FakeRemoteService.actualMoviesDto.results)
+            assertArrayEquals(movies.results, StubTestRemoteService.actualMoviesDto.results)
         }
     }
 
     @Test
     fun searchMovie() = runTest {
-        withContext(testDispatcher) {
+        launch {
             val initValue = repository.downloadPopMovies(1).results
-            assertThat("4", `is`( initValue.size.toString()))
+            assertThat(initValue.size.toString(), `is`("4"))
+        }
+        launch {
             val value = repository.searchMovieFromRemote("norte",1).results
             assertThat("1", `is`( value.size.toString()))
+            assertThat("Vientos del norte", `is`(value[0].title))
         }
     }
 
@@ -75,16 +82,21 @@ class MoviesRepositoryTest {
     }
 
     @Test
-    fun insertFavMovie() = runTest{
-        val movies = repository.downloadPopMovies(1).results.asList()
-            .asListDomainMovies(casiUrl)
+    fun insertFavMovie() = runTest(testDispatcher.scheduler){
+
+        val casiUrl = "http://image.tmdb.org/t/p/w185/%s"
+
+        val movies = repository.downloadPopMovies(1)
+            .results.asList().asListDomainMovies(casiUrl)
+
         repository.insertFavMovie(movies[0].asMovieDb())
+
         val value = repository.getMoviesFromDb().value
         TestCase.assertEquals(3, value?.size ?: 9)
     }
 
     @Test
-    fun removeFavMovie() = runTest{
+    fun removeFavMovie() = runTest(testDispatcher.scheduler) {
         repository.removeFavMovie(100)
         val value = repository.getMoviesFromDb().value
         TestCase.assertEquals(1, value?.size ?: 9)
@@ -92,9 +104,10 @@ class MoviesRepositoryTest {
 
     @Test
     fun getMovieCredits() = runTest {
-        withContext(testDispatcher) {
+        launch {
             var credits = repository.getMovieCredits(640146)
             assertThat(credits.cast[0].name, `is`("Paul Rudd"))
+
             val director = credits.crew.filter {
                 it.job == "Director"
             }[0]
@@ -108,7 +121,7 @@ class MoviesRepositoryTest {
 
     @Test
     fun getPerson() = runTest {
-        withContext(testDispatcher){
+        launch{
             var person = repository.getPerson(19034)
             assertThat(person.name, `is`("Evangeline Lilly"))
             assertThat(person.placeOfBirth, `is`("Fort Saskatchewan, Alberta, Canada"))

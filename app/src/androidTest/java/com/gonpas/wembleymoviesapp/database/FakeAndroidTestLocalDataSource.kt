@@ -1,57 +1,31 @@
 package com.gonpas.wembleymoviesapp.database
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.gonpas.wembleymoviesapp.database.StubLocalData.movieDb1
+import com.gonpas.wembleymoviesapp.database.StubLocalData.movieDb2
+import com.gonpas.wembleymoviesapp.database.StubLocalData.movieDb3
+import javax.inject.Inject
 
-class FakeAndroidTestLocalDataSource: MoviesDao {
+private const val TAG = "xxFatlds"
+class FakeAndroidTestLocalDataSource @Inject constructor(): MoviesDao {
 
-    val movieDb1 = MovieDb(
-        movieId = 100,
-        title = "El test del algoritmo",
-        overview = "Probando las funcionalidades del PopularMoviesViewModel para su lanzamiento a producción.",
-        releaseDate = "2023-04-08",
-        backdropPath = null,
-        imgUrl = "http://image.tmdb.org/t/p/w185/poster.jpg",
-        popularity = 7.7f,
-        voteAverage = 8.8f,
-        voteCount = 1000
-    )
-    private val movieDb2 = MovieDb(
-        backdropPath = null,
-        movieId = 10002,
-        title = "Vientos del norte",
-        overview = "Es la historia de Boreal",
-        imgUrl = "http://image.tmdb.org/t/p/w185/poster.jpg",
-        releaseDate = "2023-3-3",
-        popularity = 6.5f,
-        voteAverage = 8.8f,
-        voteCount = 535
-    )
-    private val movieDb3 = MovieDb(
-        backdropPath = "/3CxUndGhUcZdt1Zggjdb2HkLLQX.jpg",
-        movieId = 640146,
-        title = "Ant-Man y la Avispa: Quantumanía",
-        overview = "La pareja de superhéroes Scott Lang y Hope van Dyne regresa para continuar sus aventuras",
-        imgUrl = "http://image.tmdb.org/t/p/w185/jTNYlTEijZ6c8Mn4gvINOeB2HWM.jpg",
-        releaseDate = "2023-02-15",
-        popularity = 4665.438f,
-        voteAverage = 6.573f,
-        voteCount = 2301
-    )
-
+    private var movies = listOf<MovieDb>()
     private val _observableMovies = MutableLiveData<List<MovieDb>>()
 
     init {
-        _observableMovies.postValue(listOf(
+        movies = movies.plus(listOf(
                 movieDb1,
                 movieDb2,
                 movieDb3
-            )
-        )
+            ))
+        refreshObservableMovies()
     }
 
     override fun insertMovie(movie: MovieDb) {
-        _observableMovies.value = _observableMovies.value!!.plus(movie)
+        movies = movies.plus(movie)
+        refreshObservableMovies()
     }
 
     override fun getFavsMovies(): LiveData<List<MovieDb>> {
@@ -59,8 +33,13 @@ class FakeAndroidTestLocalDataSource: MoviesDao {
     }
 
     override suspend fun removeMovieFromDb(key: Int) {
-        _observableMovies.value = _observableMovies.value!!.filterNot {
+        movies = movies.filterNot {
             it.movieId == key
         }
+        refreshObservableMovies()
+    }
+
+    private fun refreshObservableMovies() {
+        _observableMovies.postValue(movies)
     }
 }

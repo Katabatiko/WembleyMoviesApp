@@ -8,15 +8,15 @@ import com.gonpas.wembleymoviesapp.domain.DomainActor
 
 class CastAdapter(
     private val personListener: PersonListener
-): RecyclerView.Adapter<CastAdapter.FilmViewHolder>() {
+): RecyclerView.Adapter<CastAdapter.CastViewHolder>() {
     var data = listOf<DomainActor>()
         set(value) { field = value }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
-        return FilmViewHolder.from(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CastViewHolder {
+        return CastViewHolder.from(parent)
     }
 
-    override fun onBindViewHolder(holder: FilmViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CastViewHolder, position: Int) {
         val item = data[position]
         holder.binding.actor = item
         holder.binding.profileView.setOnClickListener{
@@ -35,12 +35,12 @@ class CastAdapter(
     }
 
 
-    class FilmViewHolder(val binding: ActorItemBinding): RecyclerView.ViewHolder(binding.root){
+    class CastViewHolder(val binding: ActorItemBinding): RecyclerView.ViewHolder(binding.root){
         companion object{
-            fun from(parent: ViewGroup): FilmViewHolder{
+            fun from(parent: ViewGroup): CastViewHolder{
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding: ActorItemBinding = ActorItemBinding.inflate(layoutInflater, parent,false)
-                return FilmViewHolder(binding)
+                return CastViewHolder(binding)
             }
         }
     }

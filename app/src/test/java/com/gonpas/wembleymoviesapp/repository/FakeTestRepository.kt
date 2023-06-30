@@ -9,42 +9,46 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 private const val TAG = "xxFmrTest"
 
 @ExperimentalCoroutinesApi
-class FakeMoviesRepository(): InterfaceMoviesRepository {
+class FakeTestRepository(): MoviesRepository {
 
-    private val remoteSourceData = FakeRemoteService
-    private val localSourceData = FakeLocalDataSource()
+    private val remoteDataSource = FakeRemoteService
+    private val localDataSource = FakeLocalDataSource()
 
-
-    override suspend fun downloadPopMovies(page: Int): MoviesListDto {
-        return remoteSourceData.getPopularMovies()
-    }
-
-    override suspend fun searchMovieFromRemote(query: String, page: Int): MoviesListDto {
-        return remoteSourceData.searchMovie(query= query, page = page)
-    }
-
-    override suspend fun getMovieCredits(movieId: Int): CreditsDto {
-        return remoteSourceData.getMovieCredits(movieId)
-    }
-
-    override suspend fun getPerson(personId: Int): PersonDto {
-        return remoteSourceData.getPerson(personId)
+    // para la simulacion de errores
+    fun shouldReturnError(value: Boolean){
+        remoteDataSource.setReturnError(value)
     }
 
     override suspend fun getConfiguration(): Configuration {
-        return remoteSourceData.getConfiguration()
+        return remoteDataSource.getConfiguration()
+    }
+
+    override suspend fun downloadPopMovies(page: Int): MoviesListDto {
+        return  remoteDataSource.getPopularMovies()
+    }
+
+    override suspend fun searchMovieFromRemote(query: String, page: Int): MoviesListDto {
+        return remoteDataSource.searchMovie(query= query, page = page)
+    }
+
+    override suspend fun getMovieCredits(movieId: Int): CreditsDto {
+        return remoteDataSource.getMovieCredits(movieId)
+    }
+
+    override suspend fun getPerson(personId: Int): PersonDto {
+        return remoteDataSource.getPerson(personId)
     }
 
     override fun getMoviesFromDb(): LiveData<List<MovieDb>> {
-        return localSourceData.getFavsMovies()
+        return localDataSource.getFavsMovies()
     }
 
     override suspend fun insertFavMovie(movie: MovieDb){
-        localSourceData.insertMovie(movie)
+        localDataSource.insertMovie(movie)
     }
 
     override suspend fun removeFavMovie(movieId: Int) {
-        localSourceData.removeMovieFromDb(movieId)
+        localDataSource.removeMovieFromDb(movieId)
     }
 }
 

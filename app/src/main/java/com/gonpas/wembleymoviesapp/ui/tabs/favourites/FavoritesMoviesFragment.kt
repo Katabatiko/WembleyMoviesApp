@@ -10,34 +10,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModelProvider
 import com.gonpas.wembleymoviesapp.R
-import com.gonpas.wembleymoviesapp.WembleyMoviesApp
 import com.gonpas.wembleymoviesapp.databinding.FragmentFavoritesMoviesBinding
 import com.gonpas.wembleymoviesapp.ui.dialogs.OverviewDialogFragment
 import com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModel
-import com.gonpas.wembleymoviesapp.ui.tabs.MoviesViewModelFactory
 import com.gonpas.wembleymoviesapp.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "xxFmf"
 
+@AndroidEntryPoint
 class FavoritesMoviesFragment : Fragment() {
-
-//    lateinit var pagerAdapter: ViewPagerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val app = requireNotNull(activity).application
-//        val database = getDatabase(app)
-//        val moviesRepository = MoviesRepository(TmdbApi.tmdbApiService, database.movieDao)
-        val moviesRepository = (requireContext().applicationContext as WembleyMoviesApp).moviesRepository
-//        val viewModelFactory = MoviesViewModelFactory(app, moviesRepository, requireActivity())
-        // cuando se usa una Factory personalizada, se invoca con 'activityViewModels', si no se usa 'viewModels'
-        val viewModel by activityViewModels<MoviesViewModel>{ MoviesViewModelFactory(app, moviesRepository, requireActivity()) }
-//        val viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[MoviesViewModel::class.java]
+
+        val viewModel by activityViewModels<MoviesViewModel>()
 
         val binding = DataBindingUtil.inflate<FragmentFavoritesMoviesBinding>(inflater, R.layout.fragment_favorites_movies, container, false)
 
@@ -48,6 +38,7 @@ class FavoritesMoviesFragment : Fragment() {
             viewModel,
             // filmListener
             MovieListener {
+                Log.d(TAG,"click en ${it.title}")
                 viewModel.getCredits(it.id, it.title, it.overview)
             },
             //fabListener
@@ -73,12 +64,14 @@ class FavoritesMoviesFragment : Fragment() {
         )
         binding.listFavMovies.adapter = adapter
 
-//        viewModel.getFavs().observe(viewLifecycleOwner){
-        viewModel.favsMovies.observe(viewLifecycleOwner){
-            Log.d(TAG,"observando getFavs: $it")
-            adapter.submitList(it)
+        viewModel.favsMovies.observe(viewLifecycleOwner) {
+            viewModel.renewFavsMovies()
         }
 
+        viewModel.getFavs().observe(viewLifecycleOwner){
+//            Log.d(TAG,"observando favs: ${it.size}")
+            adapter.submitList(it)
+        }
 
         return binding.root
     }

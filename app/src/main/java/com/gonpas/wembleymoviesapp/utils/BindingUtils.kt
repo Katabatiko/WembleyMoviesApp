@@ -24,7 +24,8 @@ fun bindImage(imgView: ImageView, imgUrl: String){
             .apply(
                 RequestOptions()
                     .placeholder(R.drawable.loading_animation)
-                    .error(R.drawable.ic_broken_image))
+                    .error(R.drawable.ic_broken_image)
+            )
             .into(imgView)
     }
 }
@@ -67,13 +68,14 @@ fun TextView.localDeathdayDate(date: String?){
 }
 
 @BindingAdapter("template", "inserto")
-fun TextView.formatText(template: String, string: String){
-    text = template.format(string)
+fun TextView.formatText(template: String, string: String?){
+    if (!string.isNullOrBlank())
+        text = template.format(string)
 }
 
 
 @BindingAdapter("apiStatus")
-fun bindStatusImage(statusImgView: ImageView, status: ApiStatus){
+fun bindStatusImage(statusImgView: ImageView, status: ApiStatus?){
 
     when(status){
         ApiStatus.LOADING -> {
@@ -82,10 +84,11 @@ fun bindStatusImage(statusImgView: ImageView, status: ApiStatus){
         }
         ApiStatus.ERROR -> {
             statusImgView.visibility = View.VISIBLE
-            statusImgView.setImageResource(R.drawable.ic_broken_image)
+            statusImgView.setImageResource(R.drawable.no_internet_connection)
         }
         ApiStatus.DONE -> {
             statusImgView.visibility = View.GONE
         }
+        null -> statusImgView.visibility = View.GONE
     }
 }

@@ -44,3 +44,7 @@ class MovieListener(val clickListener: (movie: DomainMovie) -> Unit){
 class PersonListener(val clickListener: (personId: Int) -> Unit){
     fun onClick(personId: Int) = clickListener(personId)
 }
+
+class VersatileListener(val clickListener: (any: Any) -> Unit){
+    fun onClick(any: Any) = clickListener(any)
+}

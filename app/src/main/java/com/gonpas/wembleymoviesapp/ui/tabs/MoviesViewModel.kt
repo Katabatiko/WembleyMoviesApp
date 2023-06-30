@@ -1,33 +1,31 @@
 package com.gonpas.wembleymoviesapp.ui.tabs
 
 import android.app.Application
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
-import androidx.savedstate.SavedStateRegistryOwner
 import com.gonpas.wembleymoviesapp.R
-import com.gonpas.wembleymoviesapp.database.asListDomainMovies
+import com.gonpas.wembleymoviesapp.database.asLiveDataListDomainMovies
 import com.gonpas.wembleymoviesapp.domain.*
 import com.gonpas.wembleymoviesapp.network.*
-import com.gonpas.wembleymoviesapp.repository.InterfaceMoviesRepository
+import com.gonpas.wembleymoviesapp.repository.MoviesRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 enum class ApiStatus { LOADING, ERROR, DONE }
 
 private const val TAG = "xxMvm"
 
 
-class MoviesViewModel(
-    val app: Application,
-    private val repository: InterfaceMoviesRepository,
-    savedState: SavedStateHandle
-    ) : AndroidViewModel(app) {
-
-    //SavedStateHandle
-    val state = savedState
-
+@HiltViewModel
+class MoviesViewModel
+    @Inject constructor(
+        val app: Application,
+        private val repository: MoviesRepository,
+        val savedState: SavedStateHandle
+) : AndroidViewModel(app) {
 
     // LiveDatas
     private val _status = MutableLiveData<ApiStatus>()
@@ -37,56 +35,65 @@ class MoviesViewModel(
         _status.value = ApiStatus.DONE
     }
 
-    private val _popularMoviesList = MutableLiveData<List<DomainMovie>>()
-//    val popularMoviesList: LiveData<List<DomainMovie>>
-//        get() = _popularMoviesList
-    fun getPops() = state.getLiveData<List<DomainMovie>>("popMovies")
+    var configuration = MutableLiveData<DomainImages> ()
+    fun getConf() = savedState.getLiveData<DomainImages>("conf")
+
+    private var _popularMoviesList = MutableLiveData<List<DomainMovie>>()
+    fun getPops() = savedState.getLiveData<List<DomainMovie>>("popMovies")
     var totalMovies = 0
     private var nextPopPage = 1
     private var lastPopPage = 1
 
-    private val _foundMovies = MutableLiveData<List<DomainMovie>?>()
-//    val foundMovies: LiveData<List<DomainMovie>?>
-//        get() = _foundMovies
-    fun getFound() = state.getLiveData<List<DomainMovie>?>("foundMovies")
+    private var _foundMovies = MutableLiveData<List<DomainMovie>?>()
+    fun getFound() = savedState.getLiveData<List<DomainMovie>?>("foundMovies")
     var found = 0
     var nextFoundPage = 1
     private var lastFoundPage = 1
     private var lastSuccessQuery = ""
 
-    val _configuration = MutableLiveData<DomainImages> ()
-//    val configuration: LiveData<DomainImages>
-//        get() = _configuration
-    fun getConf() = state.getLiveData<DomainImages>("conf")
-
 
 
     /* FAVORITES */
-    val favsMovies: LiveData<List<DomainMovie>> = repository.getMoviesFromDb().asListDomainMovies()
-//    private val _favsMovies = state.getLiveData<List<DomainMovie>>("favsMovies")
-//    val favsMovies: LiveData<List<DomainMovie>>
-//        get() = _favsMovies
-//    fun getFavs() = state.getLiveData<List<DomainMovie>>("favsMovies")
+    var favsMovies: LiveData<List<DomainMovie>> = repository.getMoviesFromDb().asLiveDataListDomainMovies()
+
+    fun getFavs() = savedState.getLiveData<List<DomainMovie>>("favsMovies")
 
 
         /* FILM & CREDITS */
-    private val _film = MutableLiveData<DomainFilm?>()
+    private var _film = MutableLiveData<DomainFilm?>()
 //    val film: LiveData<DomainFilm?>
 //        get() = _film
-    fun getFilm() = state.getLiveData<DomainFilm?>("film")
+    fun getFilm() = savedState.getLiveData<DomainFilm?>("film")
 
-    private val _person = MutableLiveData<DomainPerson?>()
-//    val person: LiveData<DomainPerson?>
-//        get() = _person
-    fun getPerson() = state.getLiveData<DomainPerson?>("person")
+    private var _person = MutableLiveData<DomainPerson?>()
+    fun getPerson() = savedState.getLiveData<DomainPerson?>("person")
 
 
 
     init {
-//        Log.d(TAG,"savedState: ${savedState.keys()}")
-//        getFavoritesMovies()
-        downloadConfiguration()
-        downloadMovies()
+        if (savedState.keys().isNotEmpty()) {
+//            Log.d(TAG,"savedState: ${savedState.keys()}")
+            savedState.keys().forEach {
+                when (it) {
+                    "conf"          -> configuration = savedState.getLiveData("conf")
+                    "popMovies"     -> _popularMoviesList = savedState.getLiveData("popMovies")
+                    "foundMovies"   -> _foundMovies = savedState.getLiveData("foundMovies")
+                    "favsMovies"    -> favsMovies = savedState.getLiveData("favsMovies")
+                    "film"          -> _film = savedState.getLiveData("film")
+                    "person"        -> _person = savedState.getLiveData("person")
+                    // la extension de Hilt 'launchFragmentInHiltContainer crea esta key;
+                    // para corregir la no inicializacion del viewModel en tests se hace necesario esto
+                    "androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY" -> {
+                        downloadConfiguration()
+                        downloadMovies()
+                    }
+                }
+            }
+        } else {
+            _status.value = ApiStatus.DONE
+            downloadConfiguration()
+            downloadMovies()
+        }
     }
     /**
      * Se restablecen las variables de paginación
@@ -99,7 +106,7 @@ class MoviesViewModel(
         lastFoundPage = 1
     }
 
-    /**
+    /*
      * CONFIGURACION
      */
     private fun downloadConfiguration(){
@@ -115,23 +122,23 @@ class MoviesViewModel(
         }
     }
     private suspend fun getConfiguration(){
-        _configuration.value = repository.getConfiguration().images.asDomainModel()
-        state["conf"] = _configuration.value
+        configuration.value = repository.getConfiguration().images.asDomainModel()
+        savedState["conf"] = configuration.value
     }
 
     fun feedImageUrl(field: String, size: Int = 2): String{
         val template = "%s%s/"
         val imageSize = when(field){
-            "backdropSizes" -> getConf().value!!.backdropSizes.get(size)
-            "logoSizes"     -> getConf().value!!.logoSizes.get(size)
-            "posterSizes"   -> getConf().value!!.posterSizes.get(size)
-            "profileSizes"  -> getConf().value!!.profileSizes.get(size)
-            else            -> getConf().value!!.stillSizes.get(size)
+            "backdropSizes" -> getConf().value!!.backdropSizes[size]
+            "logoSizes"     -> getConf().value!!.logoSizes[size]
+            "posterSizes"   -> getConf().value!!.posterSizes[size]
+            "profileSizes"  -> getConf().value!!.profileSizes[size]
+            else            -> getConf().value!!.stillSizes[size]
         }
         return "${template.format(getConf().value?.secureBaseUrl, imageSize)}%s"
     }
 
-    /**
+    /*
      * POPULAR MOVIES
      */
     fun downloadMovies(){
@@ -145,12 +152,12 @@ class MoviesViewModel(
                 _status.value = ApiStatus.ERROR
                 // para no perder la página no descargada por el error
                 nextPopPage--
-                Toast.makeText(app, e.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(app, e.toString(), Toast.LENGTH_LONG).show()
+                Log.d(TAG,"Error: $e")
             }
         }
     }
     private suspend fun getPopularMovies(){
-
         if (nextPopPage <= lastPopPage) {
             val moviesLIstDto = repository.downloadPopMovies(nextPopPage++)
             lastPopPage = moviesLIstDto.totalPages
@@ -161,6 +168,7 @@ class MoviesViewModel(
                         .asListDomainMovies(
                             feedImageUrl("posterSizes")
                         )
+//                Log.d(TAG,"getPopMovies: ${_popularMoviesList.value}")
             } else {
                 _popularMoviesList.postValue(
                     _popularMoviesList.value!!.plus(
@@ -172,34 +180,18 @@ class MoviesViewModel(
                 )
             }
 
-            state["popMovies"] = _popularMoviesList.value
+            savedState["popMovies"] = _popularMoviesList.value
         } else {
             Toast.makeText(app, app.getText(R.string.noMas), Toast.LENGTH_LONG).show()
         }
         _status.value = ApiStatus.DONE
     }
 
-    /**
+    /*
      * FAVORITES MOVIES
      */
-    private fun getFavoritesMovies(){
-        viewModelScope.launch {
-            try {
-                retrieveFavorites()
-//                state["favsMovies"] = repository.getMoviesFromDb().asListDomainMovies().value
-            }catch (ce: CancellationException){
-                throw ce
-            }catch (e: Exception){
-                _status.value = ApiStatus.ERROR
-                Log.d(TAG,"onError downloading favsMovies: $e")
-                Toast.makeText(app, e.message, Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-    private fun retrieveFavorites(){
-        val favsMovies = repository.getMoviesFromDb().asListDomainMovies()
-        Log.d(TAG,"retrieveFavorites: ${repository.getMoviesFromDb().asListDomainMovies().value}")
-        state["favsMovies"] = favsMovies.value
+    fun renewFavsMovies() {
+        savedState["favsMovies"] = favsMovies.value
     }
 
     fun saveFavMovie(movie: DomainMovie){
@@ -226,8 +218,8 @@ class MoviesViewModel(
 
             getPops().value!!.subList(rangoInf, lastPos).forEach { pop ->
 //                Log.d(TAG,"titulo en parcial: ${pop.title} -> ${pop.id}")
-                favsMovies.value!!.forEach {
-//                getFavs().value!!.forEach{
+//                _favsMovies.value!!.forEach {
+                getFavs().value!!.forEach{
                     if (it.id == pop.id) {
                         pop.fav = true
     //                        Log.d(TAG,"favorita: ${it.title}")
@@ -236,22 +228,19 @@ class MoviesViewModel(
             }
         } else {
             getPops().value!!.forEach { pop ->
-//                Log.d(TAG,"pop.title: ${pop.title} -> ${pop.id}")
-                favsMovies.value!!.forEach {
-//                getFavs().value!!.forEach {
+//                _favsMovies.value!!.forEach {
+                getFavs().value!!.forEach {
                     pop.fav = it.id == pop.id
-//                    Log.d(TAG,"fav.id: ${it.id} - pop.fav: ${pop.fav}")
-
                 }
             }
         }
     }
 
-    val noHayFavorites = favsMovies.map {
+    val noHayFavorites = savedState.getLiveData<List<DomainMovie>>("favsMovies").map {
         it.isEmpty()
     }
 
-    /**
+    /*
      * BUSQUEDA
      */
     fun searchMovies(query: String?){
@@ -295,7 +284,7 @@ class MoviesViewModel(
                     )
                 )
             }
-            state["foundMovies"] = _foundMovies.value
+            savedState["foundMovies"] = _foundMovies.value
         } else {
             Toast.makeText(app, app.getText(R.string.noMas), Toast.LENGTH_LONG).show()
 //            Log.d(TAG,"busqueda sin resultados")
@@ -305,7 +294,7 @@ class MoviesViewModel(
 
     fun resetSearch(){
         _foundMovies.value = null
-        state["foundMovies"] = null
+        savedState["foundMovies"] = null
         found = 0
     }
 
@@ -314,13 +303,12 @@ class MoviesViewModel(
     }
 
 
-    /**
+    /*
      * FILM & CREDITS
      */
     fun getCredits(id: Int, title: String, overview: String){
 
         _status.value = ApiStatus.LOADING
-        Log.d(TAG,"status: ${status.value}")
         viewModelScope.launch {
             try {
                 getMovieCredits(id, title, overview)
@@ -347,7 +335,7 @@ class MoviesViewModel(
             ),
             credits.crew.asList().asListDomainModel()
         )
-        state["film"] = _film.value
+        savedState["film"] = _film.value
     }
 
     fun getPersonData(personId: Int){
@@ -365,31 +353,29 @@ class MoviesViewModel(
         }
         _status.value = ApiStatus.DONE
     }
-    suspend fun getPersonProfile(personId: Int){
+    private suspend fun getPersonProfile(personId: Int){
         _person.value = repository.getPerson(personId).asDomainModel(feedImageUrl("profileSizes"))
-        state["person"] = _person.value
+        savedState["person"] = _person.value
     }
     fun resetPerson(){
         _person.value = null
-        state["person"] = null
+        savedState["person"] = null
     }
+
+//    companion object{
+//
+//        val Factory: ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                val savedStateHandle = createSavedStateHandle()
+//                val application = this[APPLICATION_KEY] as WembleyMoviesApp
+//                val moviesRepository = application.moviesRepository
+//                MoviesViewModel(
+//                    application,
+//                    moviesRepository,
+//                    savedStateHandle
+//                )
+//            }
+//        }
+//    }
 }
 
-
-@Suppress("UNCHECKED_CAST")
-class MoviesViewModelFactory(
-    private val app: Application,
-    private val moviesRepository: InterfaceMoviesRepository,
-    owner: SavedStateRegistryOwner,
-    defaultArgs: Bundle? = null
-    ): AbstractSavedStateViewModelFactory(owner, defaultArgs){
-
-
-    override fun <T : ViewModel> create(
-        key: String,
-        modelClass: Class<T>,
-        handle: SavedStateHandle
-    ): T {
-        return MoviesViewModel(app, moviesRepository, handle) as T
-    }
-}
