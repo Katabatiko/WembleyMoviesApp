@@ -1,6 +1,6 @@
 <h1 align="center" id="title">Wembley Movies App</h1>
 
-<p id="description">Aplicación para el aprovechamiento de la base de datos de películas que gestiona The Movie Database y pone a disposición através de una API pública.<br/>Requiere una clave API_KEY que se puede obtener en el sitio web https://www.themoviedb.org. Una vez obtenida introducirla en el archivo TmdbApiService.kt</p>
+<p id="description">Aplicación para el aprovechamiento de la base de datos de películas que gestiona The Movie Database y pone a disposición através de una API pública.<br/>Requiere una clave API_KEY que se puede obtener en el sitio web https://www.themoviedb.org. Una vez obtenida introducirla en el archivo <i>local.properties</i> estableciendo la asignación <i>apiKey="TU_API_KEY"</i></p>
 
 
 <h2>Características</h2>

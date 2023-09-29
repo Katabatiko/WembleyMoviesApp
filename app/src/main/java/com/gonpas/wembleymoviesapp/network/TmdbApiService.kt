@@ -1,8 +1,9 @@
 package com.gonpas.wembleymoviesapp.network
 
+import com.gonpas.wembleymoviesapp.BuildConfig
 import retrofit2.http.*
 
-private const val API_KEY = "Insert here The Movie Db API_KEY"
+private const val API_KEY = BuildConfig.apiKey
 
 
 interface TmdbApiService {
